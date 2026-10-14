@@ -41,7 +41,7 @@ struct SingerDetail {
           Row({ space:'16lpx' }) {
             Row() {
               if (this.songDetail.length>0){
-                Image(Config.resolveUrl(this.songDetail)[0].pic)
+                Image(Config.resolveUrl(this.songDetail[0].pic))
                   .width('80%')
                   .opacity(0.8)
                   .fillColor('#ff5186')

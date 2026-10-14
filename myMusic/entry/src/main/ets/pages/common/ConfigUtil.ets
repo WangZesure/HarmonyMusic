@@ -17,8 +17,8 @@ export  class ConfigUtil{
    *  - 以 /stream/ 等服务器根路径开头：拼 Config.SERVER（Koa 的播放接口）
    *  - 其余相对路径（老数据的 /img、/song）：拼 Config.SERVER_URL，兼容旧数据
    */
-  static resolveUrl(u: string): string {
-    if (!u) return u;
+  static resolveUrl(u: string | undefined): string {
+    if (!u) return '';
     if (u.startsWith('http://') || u.startsWith('https://')) return u;
     if (u.startsWith('/img/') || u.startsWith('/song/') || u.startsWith('/uploads/')) {
       return ConfigUtil.SERVER_URL + u;

@@ -122,7 +122,9 @@ export struct Mine {
           } else {
             Text("登录/注册").fontSize("33lpx").fontColor('#666666').width("100%").onClick(() => {
               router.pushUrl({
-                url: "pages/pass/CodeLoginStepOne"
+                // was "pages/pass/CodeLoginStepOne" — that page does not exist and is not in
+                // main_pages.json, so the button silently did nothing. pages/Login is the real one.
+                url: "pages/Login"
               })
             })
           }
