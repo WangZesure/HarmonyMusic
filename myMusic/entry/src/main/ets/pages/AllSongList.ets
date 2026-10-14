@@ -37,7 +37,7 @@ struct AllSongList {
             ListItem() {
               Row({space:'24lpx'}) {
                 Row() {
-                  Image(Config.SERVER_URL+item.pic)
+                  Image(Config.resolveUrl(item.pic))
                     .borderRadius('16lpx')
                     .width('120lpx')
                 }

@@ -1,5 +1,8 @@
 const Koa = require('koa')
 const app = new Koa()
+const path = require('path')
+// Load repo-root .env (JAMENDO_CLIENT_ID for the /stream/:id proxy, DB config, ...)
+require('dotenv').config({ path: path.join(__dirname, '../.env') })
 const views = require('koa-views')
 const json = require('koa-json')
 const onerror = require('koa-onerror')

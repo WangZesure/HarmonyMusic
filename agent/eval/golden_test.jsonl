@@ -1,0 +1,74 @@
+{"id": "test-006", "type": "title", "query": "有没有人听过 heiwr 的 Quatro Pareds 啊，一首葡语情歌，挺浪漫的", "gold_ids": [1981752], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-033", "type": "lyric", "query": "有句歌词是 It's give and take game, it's give and take 的歌叫什么", "gold_ids": [1932670], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-095", "type": "absent", "query": "陈奕迅 富士山下", "gold_ids": [], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-046", "type": "describe", "query": "求一首俄语说唱情歌，迷幻浪漫，适合深夜听，表达思念与爱恋，带点忧郁梦幻的感觉", "gold_ids": [1533348], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-055", "type": "describe", "query": "适合雨天深夜听的伤感失恋民谣，唱出思念和痛苦", "gold_ids": [1926466], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-098", "type": "absent", "query": "放一下 Taylor Swift 的 Love Story", "gold_ids": [], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-042", "type": "describe", "query": "求一首电子舞曲，节奏感强，适合跑步健身或派对，歌词讲思绪混乱但依然闪耀励志、让人开心", "gold_ids": [2229014], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-059", "type": "describe", "query": "求一首温暖励志的独立民谣，鼓励人勇敢前行、相信一切都会好起来，适合清晨散步或跑步时听", "gold_ids": [1687185], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-036", "type": "lyric", "query": "人生中有些时候，唯一的解药就是跳舞", "gold_ids": [1958457], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-030", "type": "lyric", "query": "有一首歌歌词是 For the boy who never smiled", "gold_ids": [1892938], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-045", "type": "describe", "query": "一首浪漫温暖的法语爵士情歌，适合咖啡馆和婚礼，唱的是恋人甜蜜初吻的心动时刻", "gold_ids": [964536], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-016", "type": "lyric", "query": "有一首歌歌词是 Ce soir je ferais mieux de ne boire que de l’eau，是什么歌？", "gold_ids": [1892677], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-043", "type": "describe", "query": "适合清晨睡前听的温暖平静的雷鬼R&B敬拜歌曲，表达对神的爱与赞美", "gold_ids": [2147998], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-015", "type": "lyric", "query": "我想成为照亮你每一步的星星", "gold_ids": [1892110], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-003", "type": "title", "query": "Samie Bower 的 Where's the Luv 这首歌在哪能听啊", "gold_ids": [2214037], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-009", "type": "title", "query": "求一首歌，名字好像叫 Angel of Sorow，歌词有 Sorrow breaks through 那句，挺伤感的", "gold_ids": [2272813], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-019", "type": "lyric", "query": "My name in your mind. You gonna remember this night. Give me what I say you're doing everything, right? Trust me. I'm with you tonight. We dance with the sun come through right now. I hope that I'll see you soon.", "gold_ids": [2311697], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-024", "type": "lyric", "query": "请告诉我为什么你感觉如此低落", "gold_ids": [1895179], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-014", "type": "title", "query": "AlexGrohl 的 Tropic Daze 这首歌挺适合夏天放松听的", "gold_ids": [2260818], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-013", "type": "title", "query": "Pigamma sound 的 Radici 这首歌讲的是什么意思？", "gold_ids": [2169223], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-005", "type": "title", "query": "Tab的Pyre这首歌好适合深夜听啊", "gold_ids": [1969660], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-052", "type": "describe", "query": "一首怀旧民谣，追忆青春革命与逝去时光，适合深夜散步或咖啡馆里静静聆听", "gold_ids": [1820439], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-023", "type": "lyric", "query": "我的梦中女孩留在了我的梦里", "gold_ids": [1893964], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-038", "type": "lyric", "query": "我慢慢消失 失去我的地盘", "gold_ids": [2264039], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-011", "type": "title", "query": "求一首氛围感很强的器乐，叫 Reflexions，Francesco 的，适合睡前听", "gold_ids": [709208], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-022", "type": "lyric", "query": "有句歌词是 It'll wash their thoughts and words away 的歌叫什么", "gold_ids": [2305427], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-021", "type": "lyric", "query": "我们会在院子里玩那些操场上的游戏", "gold_ids": [1558911], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-025", "type": "lyric", "query": "但你迟到了才出现在派对", "gold_ids": [1635094], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-040", "type": "describe", "query": "求一首说唱情歌，战火纷飞中思念爱人，玫瑰与街垒交织，拉丁风味，既燃又浪漫还带点愤怒", "gold_ids": [1203598], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-010", "type": "title", "query": "Igor Pumphonia 的 Portal 这首歌在哪能听？", "gold_ids": [2216420], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-039", "type": "lyric", "query": "当你看到那个忧心忡忡的男人，你能看到他眉间的皱纹", "gold_ids": [2295475], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-029", "type": "lyric", "query": "当闹钟的重量仍然难以承受时 我会走下去", "gold_ids": [893870], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-057", "type": "describe", "query": "适合清晨学习时听的平静励志灵魂乐，带有灵性教诲和希望感", "gold_ids": [2235921], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-099", "type": "absent", "query": "薛之谦 演员", "gold_ids": [], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-097", "type": "absent", "query": "五月天的倔强", "gold_ids": [], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-028", "type": "lyric", "query": "当闹钟的重量仍然难以承受时 我会走下去", "gold_ids": [893870], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-053", "type": "describe", "query": "求一首法语民谣摇滚，唱独居男人深夜喝酒听歌、孤独失恋忧郁的歌", "gold_ids": [1703922], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-035", "type": "lyric", "query": "我必须承认最近状态不好 有些心事想倾诉 心魔不断考验我 没有轻松的出路 你也不让我好过 我只能独自战斗 尽管我需要有人来解救", "gold_ids": [2294524], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-012", "type": "title", "query": "Gelbriseok 的 Stimulate 这首歌好伤感，深夜一个人听特别有感觉", "gold_ids": [1401508], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-017", "type": "lyric", "query": "Для чего и кем ты рождён, вспоминай! 这句歌词是哪首歌", "gold_ids": [1959709], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-047", "type": "describe", "query": "求一首俄语女声吟唱、氛围神秘忧郁、关于灵魂与身体割裂的民谣", "gold_ids": [2306274], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-000", "type": "title", "query": "Jackson Frost 的 Future Chill 这首歌听起来很放松，适合睡前听吗？", "gold_ids": [1980623], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-044", "type": "describe", "query": "适合深夜听的伤感怀旧民谣，关于失恋后怀念过去真实的对方", "gold_ids": [1704471], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-096", "type": "absent", "query": "李荣浩 年少有为", "gold_ids": [], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-056", "type": "describe", "query": "求一首电子拉丁风格的情歌，氛围浪漫梦幻又温暖，适合深夜听，讲失重般缠绵的爱恋", "gold_ids": [2024290], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-008", "type": "title", "query": "有没有人听过 Igor Pumphonia 的《Moring》？就是那首迷离电子氛围的歌", "gold_ids": [2255954], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-050", "type": "describe", "query": "空灵女声反复吟唱时间流逝与反战祈愿的宁静希望氛围歌曲", "gold_ids": [2159195], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-051", "type": "describe", "query": "求一首经典民谣，旋律平静忧伤，讲爱情像宽阔的河水难以跨越，最终如夏日露水般消散，适合深夜睡前听", "gold_ids": [2288716], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-020", "type": "lyric", "query": "上帝创造了我以及我所看到的一切 歌词", "gold_ids": [1969615], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-001", "type": "title", "query": "Samie Bower 的 Who Called Who 这首歌好适合深夜听啊", "gold_ids": [1863813], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-002", "type": "title", "query": "有没有人知道 Alex Saym 的 Minmal Dreamy Ambient 这首歌？", "gold_ids": [2159186], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-018", "type": "lyric", "query": "我潜入那蓝色空气中如此充满电流感", "gold_ids": [962055], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-054", "type": "describe", "query": "求一首心碎说唱，讲被背叛后挣扎放手，适合深夜听，带R&B伤感氛围", "gold_ids": [1967938], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-037", "type": "lyric", "query": "有一句歌词是 The one who cuts through grief and binds two hearts as one 的歌叫什么", "gold_ids": [2272813], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-032", "type": "lyric", "query": "有首歌歌词是 It's funny how the cooler season helps you contemplate your knees now", "gold_ids": [2240222], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-048", "type": "describe", "query": "求一首巴西小镇黄昏民谣，温暖怀旧又带乡愁与希望的拉丁世界音乐", "gold_ids": [2147477], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-034", "type": "lyric", "query": "那夜晚会像白天一样闪耀", "gold_ids": [1741601], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-004", "type": "title", "query": "Parker 的 Charlie II 这首歌在哪能听？", "gold_ids": [1635094], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-049", "type": "describe", "query": "求一首金属摇滚风格的歌，情绪愤怒又失落，深夜听很燃，唱的是在痛苦中挣扎呐喊、渴望从伤痛中获救", "gold_ids": [2318937], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-031", "type": "lyric", "query": "每天我都感谢上帝让我活在这个世上还能看见月亮", "gold_ids": [647352], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-058", "type": "describe", "query": "求一首舞曲节奏但歌词很伤感孤独、深夜失恋时渴望被拯救释放的歌", "gold_ids": [2294524], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-026", "type": "lyric", "query": "有一句歌词是 She'll burn the words they are for her alone 的歌叫什么", "gold_ids": [1807394], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-041", "type": "describe", "query": "适合清晨开车听的治愈励志民谣摇滚，唱的是经历失恋伤痛后依然勇敢去爱、活出自我", "gold_ids": [1932323], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-007", "type": "title", "query": "Grégoire Lourme 的 Enter The Metaverse 带合唱版在哪能听？", "gold_ids": [1939137], "graded": null, "constraints": null, "split": "test"}
+{"id": "test-x000", "type": "absent", "query": "邓紫棋 的 Sign Of Life", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x001", "type": "absent", "query": "五月天的歌单", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x002", "type": "absent", "query": "富士山下", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x003", "type": "absent", "query": "邓紫棋 的 This World", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x004", "type": "absent", "query": "周杰伦的歌单", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x005", "type": "absent", "query": "Someone Like You", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x006", "type": "absent", "query": "五月天 的 Ambient Calm Music", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x007", "type": "absent", "query": "周杰伦随便放点", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x008", "type": "absent", "query": "Yesterday", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}
+{"id": "test-x009", "type": "absent", "query": "Adele 的 My Inspiration", "gold_ids": [], "graded": null, "constraints": null, "split": "dev"}

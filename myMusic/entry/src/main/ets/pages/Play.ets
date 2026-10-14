@@ -75,7 +75,7 @@ struct Play {
             Stack({ alignContent: Alignment.Top }) {
               Row() {
                 Row() {
-                  Image(Config.SERVER_URL+this.playState.pic)
+                  Image(Config.resolveUrl(this.playState.pic))
                     .width('70%')
                     .borderRadius('800lpx')
                 }

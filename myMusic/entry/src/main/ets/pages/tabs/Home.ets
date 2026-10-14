@@ -61,7 +61,7 @@ export struct Home{
   getSwiperListWidget(){
     Swiper() {
       ForEach(this.swiperList, (item: SwiperModel) => {
-        Image(`${Config.SERVER_URL}${item.imgurl}`)
+        Image(Config.resolveUrl(item.imgurl))
           .width('100%')
           .height('400lpx')
           .objectFit(ImageFit.Cover)
@@ -95,7 +95,7 @@ export struct Home{
           ForEach(this.recommendSongs, (item: RecommendSongModel) => {
             Row() {
               // 歌曲封面
-              Image(Config.SERVER_URL + item.pic)
+              Image(Config.resolveUrl(item.pic))
                 .width('120lpx')
                 .height('120lpx')
                 .borderRadius('12lpx')
@@ -180,7 +180,7 @@ export struct Home{
             ForEach(this.songList, (item: SongListModel) => {
               Column() {
                 Row() {
-                  Image(Config.SERVER_URL +item.pic)
+                  Image(Config.resolveUrl(item.pic))
                     .width('100%')
                     .aspectRatio(1)
                     .borderRadius('16lpx')
@@ -260,7 +260,7 @@ export struct Home{
             ForEach(this.singerList, (item: SingerModel) => {
               Column() {
                 Row() {
-                  Image(Config.SERVER_URL+item.pic)
+                  Image(Config.resolveUrl(item.pic))
                     .width('100%')
                     .borderRadius('16lpx')
                   Text(item.name)

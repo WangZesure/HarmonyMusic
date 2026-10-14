@@ -1,0 +1,1167 @@
+{
+  "success": [
+    {
+      "query": "Move a Little Closer",
+      "message": "为你找到以下歌曲：",
+      "relaxed": [],
+      "songs": [
+        {
+          "song_id": 7359,
+          "name": "Move a Little Closer",
+          "artist": "Steven Dunston",
+          "moods": [
+            "平静",
+            "慵懒",
+            "治愈",
+            "浪漫",
+            "温暖"
+          ],
+          "scenes": [
+            "恋爱",
+            "睡前"
+          ],
+          "reason": "歌名与需求完全一致，标签包含平静、慵懒、治愈、浪漫、温暖、恋爱、睡前、民谣、流行，契合温暖浪漫的睡前氛围。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 2243031,
+          "name": "Move Your Body",
+          "artist": "ChoiceTune",
+          "moods": [
+            "史诗",
+            "燃"
+          ],
+          "scenes": [
+            "健身",
+            "派对"
+          ],
+          "reason": "歌名与需求相近，标签包含史诗、燃、健身、派对、电子、舞曲，适合充满能量的舞动场景。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1831809,
+          "name": "Lover",
+          "artist": "Square a Saw",
+          "moods": [
+            "开心",
+            "浪漫",
+            "温暖",
+            "甜美"
+          ],
+          "scenes": [
+            "恋爱",
+            "派对",
+            "深夜"
+          ],
+          "reason": "标签包含开心、浪漫、温暖、甜美、恋爱、派对、深夜、流行、电子、舞曲，契合浪漫甜蜜的深夜派对氛围。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 889548,
+          "name": "The little voice",
+          "artist": "Laurent Danis",
+          "moods": [
+            "伤感",
+            "平静",
+            "怀旧",
+            "治愈"
+          ],
+          "scenes": [
+            "深夜",
+            "睡前"
+          ],
+          "reason": "标签包含伤感、平静、怀旧、治愈、深夜、睡前、氛围、电子，适合安静治愈的深夜睡前聆听。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1969660,
+          "name": "Pyre (feat.Happy Little Accidents,Jade Gritty & Aurc)",
+          "artist": "Tab",
+          "moods": [
+            "平静",
+            "忧郁",
+            "梦幻"
+          ],
+          "scenes": [
+            "咖啡馆",
+            "深夜",
+            "睡前"
+          ],
+          "reason": "标签包含平静、忧郁、梦幻、咖啡馆、深夜、睡前、氛围、独立、电子，适合梦幻氛围的深夜睡前聆听。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "title"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [],
+          "ms": 79
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "title": 24,
+            "semantic": 0
+          }
+        },
+        {
+          "step": "rank",
+          "n": 24,
+          "top": [
+            7359,
+            1.7300409191577886
+          ]
+        },
+        {
+          "step": "respond",
+          "n": 5
+        }
+      ]
+    },
+    {
+      "query": "有句歌词大概是说 move a little closer",
+      "message": "为你找到以下歌曲：",
+      "relaxed": [],
+      "songs": [
+        {
+          "song_id": 7359,
+          "name": "Move a Little Closer",
+          "artist": "Steven Dunston",
+          "moods": [
+            "平静",
+            "慵懒",
+            "治愈",
+            "浪漫",
+            "温暖"
+          ],
+          "scenes": [
+            "恋爱",
+            "睡前"
+          ],
+          "reason": "歌名与歌词直接呼应，是一首平静慵懒的温暖民谣，适合恋爱睡前聆听。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1336999,
+          "name": "Gravity",
+          "artist": "eve",
+          "moods": [
+            "伤感",
+            "平静",
+            "忧郁",
+            "浪漫"
+          ],
+          "scenes": [
+            "失恋",
+            "恋爱",
+            "深夜"
+          ],
+          "reason": "eve的这首民谣带着伤感忧郁的浪漫气息，适合深夜独自品味失恋心情。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1892677,
+          "name": "Simplement",
+          "artist": "Ben5bass",
+          "moods": [
+            "平静",
+            "怀旧",
+            "浪漫",
+            "温暖"
+          ],
+          "scenes": [
+            "咖啡馆",
+            "恋爱",
+            "散步"
+          ],
+          "reason": "这首法语民谣平静怀旧又温暖，像咖啡馆散步时的浪漫配乐。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 110207,
+          "name": "Caught Inside A Dream",
+          "artist": "Briareus",
+          "moods": [
+            "平静",
+            "慵懒",
+            "梦幻",
+            "浪漫"
+          ],
+          "scenes": [
+            "恋爱",
+            "深夜",
+            "睡前"
+          ],
+          "reason": "梦幻慵懒的氛围爵士电子，仿佛置身梦中，适合深夜睡前放松。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1658149,
+          "name": "Show Me",
+          "artist": "AIRE",
+          "moods": [
+            "伤感",
+            "励志",
+            "希望",
+            "忧郁",
+            "燃"
+          ],
+          "scenes": [
+            "学习",
+            "深夜"
+          ],
+          "reason": "AIRE这首摇滚在忧郁中带着励志与希望，适合深夜燃起学习动力。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "title"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [],
+          "ms": 1
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "title": 24,
+            "semantic": 20
+          }
+        },
+        {
+          "step": "rank",
+          "n": 30,
+          "top": [
+            7359,
+            1.7247227082720584
+          ]
+        },
+        {
+          "step": "respond",
+          "n": 5
+        }
+      ]
+    },
+    {
+      "query": "有时候没有你我简直无法呼吸",
+      "message": "为你找到以下歌曲：",
+      "relaxed": [],
+      "songs": [
+        {
+          "song_id": 1336999,
+          "name": "Gravity",
+          "artist": "eve",
+          "moods": [
+            "伤感",
+            "平静",
+            "忧郁",
+            "浪漫"
+          ],
+          "scenes": [
+            "失恋",
+            "恋爱",
+            "深夜"
+          ],
+          "reason": "",
+          "match": {
+            "type": "lyric",
+            "line_no": 8,
+            "line_text": null,
+            "start_ms": 52920
+          }
+        },
+        {
+          "song_id": 1831809,
+          "name": "Lover",
+          "artist": "Square a Saw",
+          "moods": [
+            "开心",
+            "浪漫",
+            "温暖",
+            "甜美"
+          ],
+          "scenes": [
+            "恋爱",
+            "派对",
+            "深夜"
+          ],
+          "reason": "",
+          "match": {
+            "type": "lyric",
+            "line_no": 63,
+            "line_text": null,
+            "start_ms": 189900
+          }
+        },
+        {
+          "song_id": 1926466,
+          "name": "WHEN I'M WITHOUT YOU",
+          "artist": "Egor Budennyy",
+          "moods": [
+            "伤感",
+            "史诗",
+            "失落",
+            "忧郁",
+            "浪漫"
+          ],
+          "scenes": [
+            "失恋",
+            "恋爱",
+            "深夜",
+            "雨天"
+          ],
+          "reason": "",
+          "match": {
+            "type": "lyric",
+            "line_no": 47,
+            "line_text": null,
+            "start_ms": 173160
+          }
+        },
+        {
+          "song_id": 1430843,
+          "name": "I Need To Go",
+          "artist": "Sam Garbett",
+          "moods": [
+            "伤感",
+            "失落",
+            "孤独",
+            "燃"
+          ],
+          "scenes": [
+            "失恋",
+            "旅行",
+            "深夜"
+          ],
+          "reason": "",
+          "match": {
+            "type": "lyric",
+            "line_no": 35,
+            "line_text": null,
+            "start_ms": 209200
+          }
+        },
+        {
+          "song_id": 1841895,
+          "name": "Vivere per te",
+          "artist": "Ben5bass",
+          "moods": [
+            "伤感",
+            "希望",
+            "愤怒",
+            "浪漫",
+            "燃"
+          ],
+          "scenes": [
+            "失恋",
+            "恋爱",
+            "深夜"
+          ],
+          "reason": "",
+          "match": {
+            "type": "lyric",
+            "line_no": 18,
+            "line_text": null,
+            "start_ms": 113840
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "lyric"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [
+            "伤感",
+            "浪漫",
+            "忧郁",
+            "失恋",
+            "深夜"
+          ],
+          "ms": 40
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "lyric": 51,
+            "semantic": 20
+          }
+        },
+        {
+          "step": "rank",
+          "n": 30,
+          "top": [
+            1336999,
+            1.0
+          ]
+        },
+        {
+          "step": "respond",
+          "n": 5
+        }
+      ]
+    },
+    {
+      "query": "求一首深夜伤感的德语民谣",
+      "message": "（放宽了：去掉软偏好、放宽场景）为你找到以下歌曲：",
+      "relaxed": [
+        "去掉软偏好",
+        "放宽场景"
+      ],
+      "songs": [
+        {
+          "song_id": 1334445,
+          "name": "777",
+          "artist": "Sperling",
+          "moods": [
+            "伤感",
+            "希望",
+            "开心",
+            "治愈",
+            "燃"
+          ],
+          "scenes": [
+            "失恋",
+            "深夜"
+          ],
+          "reason": "Sperling 的这首民谣带有伤感与深夜标签，适合在寂静夜晚独自聆听，让忧郁情绪缓缓流淌。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "describe"
+          ],
+          "filters": {
+            "genres": [
+              "民谣"
+            ],
+            "moods": [
+              "伤感"
+            ],
+            "scenes": [
+              "深夜"
+            ],
+            "vocal": null,
+            "languages": [
+              "de"
+            ],
+            "duration_s": null
+          },
+          "soft_tags": [
+            "忧郁",
+            "孤独"
+          ],
+          "ms": 1161
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "semantic": 1
+          }
+        },
+        {
+          "step": "rank",
+          "n": 1,
+          "top": [
+            1334445,
+            0.7242906964707078
+          ]
+        },
+        {
+          "step": "relax",
+          "applied": "去掉软偏好",
+          "n": 1
+        },
+        {
+          "step": "relax",
+          "applied": "放宽场景",
+          "n": 1
+        },
+        {
+          "step": "respond",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "query": "推荐点适合跑步的燃曲",
+      "message": "为你找到以下歌曲：",
+      "relaxed": [],
+      "songs": [
+        {
+          "song_id": 1667885,
+          "name": "Future of the Sound",
+          "artist": "J.O.R.B.I",
+          "moods": [
+            "励志",
+            "开心",
+            "燃"
+          ],
+          "scenes": [
+            "健身",
+            "派对",
+            "跑步"
+          ],
+          "reason": "电子舞曲节奏强劲，励志又燃，适合跑步时提升能量。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 137699,
+          "name": "Doira",
+          "artist": "Runa Raido",
+          "moods": [
+            "燃",
+            "神秘"
+          ],
+          "scenes": [
+            "开车",
+            "跑步"
+          ],
+          "reason": "摇滚风格燃感十足，节奏带劲，跑步时能激发动力。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1480423,
+          "name": "The Path To Power",
+          "artist": "Paul Werner",
+          "moods": [
+            "史诗",
+            "燃"
+          ],
+          "scenes": [
+            "健身",
+            "跑步"
+          ],
+          "reason": "史诗原声配乐充满力量感，跑步时助你保持强劲节奏。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1953928,
+          "name": "The Final Battle (With Choir)",
+          "artist": "Grégoire Lourme",
+          "moods": [
+            "史诗",
+            "愤怒",
+            "燃",
+            "紧张"
+          ],
+          "scenes": [
+            "健身",
+            "跑步"
+          ],
+          "reason": "史诗燃曲紧张又愤怒，健身跑步时能点燃斗志。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 2056435,
+          "name": "Motivation Uplifting Rock",
+          "artist": "ZaharVips",
+          "moods": [
+            "励志",
+            "史诗",
+            "燃"
+          ],
+          "scenes": [
+            "健身",
+            "跑步"
+          ],
+          "reason": "励志摇滚燃力十足，节奏强劲，适合跑步提升状态。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "describe"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [
+              "燃"
+            ],
+            "scenes": [
+              "跑步"
+            ],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [
+            "电子",
+            "摇滚",
+            "舞曲",
+            "励志"
+          ],
+          "ms": 40
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "semantic": 20
+          }
+        },
+        {
+          "step": "rank",
+          "n": 20,
+          "top": [
+            1667885,
+            0.7144078938757866
+          ]
+        },
+        {
+          "step": "respond",
+          "n": 5
+        }
+      ]
+    }
+  ],
+  "boundary": [
+    {
+      "query": "Coldplay 的 Yellow",
+      "message": "曲库里没有 Coldplay 的《Yellow》。另有一首同名《Yellow》（歌手：Sam Opoku）。",
+      "relaxed": [],
+      "songs": [],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "title"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [],
+          "ms": 2
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "title": 1,
+            "semantic": 20
+          }
+        }
+      ]
+    },
+    {
+      "query": "求一首叫 Night Str 的歌，Sergey Gulevich 唱的",
+      "message": "为你找到以下歌曲：",
+      "relaxed": [],
+      "songs": [
+        {
+          "song_id": 1693791,
+          "name": "Night Star",
+          "artist": "Sergey Gulevich",
+          "moods": [
+            "平静",
+            "梦幻",
+            "浪漫"
+          ],
+          "scenes": [
+            "恋爱",
+            "深夜",
+            "睡前"
+          ],
+          "reason": "歌名与用户所寻的Night Star一致，且同为Sergey Gulevich的平静梦幻深夜氛围电子之作。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1818772,
+          "name": "Feel the Day",
+          "artist": "Sergey Gulevich",
+          "moods": [
+            "平静",
+            "梦幻",
+            "治愈"
+          ],
+          "scenes": [
+            "清晨",
+            "睡前"
+          ],
+          "reason": "同为Sergey Gulevich的平静梦幻氛围作品，适合睡前聆听。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 2301582,
+          "name": "Spheroid",
+          "artist": "Youthopian",
+          "moods": [
+            "平静",
+            "梦幻",
+            "神秘"
+          ],
+          "scenes": [
+            "学习",
+            "深夜",
+            "睡前"
+          ],
+          "reason": "平静梦幻的深夜睡前氛围电子，与用户偏好的风格相近。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 709208,
+          "name": "Réflexions",
+          "artist": "Francesco",
+          "moods": [
+            "伤感",
+            "平静",
+            "忧郁",
+            "怀旧",
+            "梦幻"
+          ],
+          "scenes": [
+            "学习",
+            "深夜",
+            "睡前"
+          ],
+          "reason": "平静梦幻的深夜睡前氛围电子，带有忧郁怀旧气息。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1401508,
+          "name": "Stimulate - One Word",
+          "artist": "Gelbriseok",
+          "moods": [
+            "伤感",
+            "失落",
+            "孤独",
+            "平静",
+            "忧郁",
+            "慵懒"
+          ],
+          "scenes": [
+            "失恋",
+            "深夜"
+          ],
+          "reason": "平静忧郁的深夜氛围电子，适合孤独睡前时刻。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "title",
+            "artist"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [],
+          "ms": 98
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "title": 3,
+            "semantic": 20
+          }
+        },
+        {
+          "step": "rank",
+          "n": 20,
+          "top": [
+            1693791,
+            0.7237088237581307
+          ]
+        },
+        {
+          "step": "respond",
+          "n": 5
+        }
+      ]
+    },
+    {
+      "query": "来首周杰伦的晴天",
+      "message": "曲库里没有「晴天」这首歌，要不要试试按风格或氛围描述来找？",
+      "relaxed": [],
+      "songs": [],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "title",
+            "artist"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [
+            "流行",
+            "怀旧",
+            "伤感"
+          ],
+          "ms": 50
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "title": 0,
+            "semantic": 20
+          }
+        }
+      ]
+    },
+    {
+      "query": "Someone Like You",
+      "message": "曲库里没有「Someone Like You」这首歌，要不要试试按风格或氛围描述来找？",
+      "relaxed": [],
+      "songs": [],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "title"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [],
+            "scenes": [],
+            "vocal": null,
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [
+            "伤感",
+            "失恋",
+            "流行"
+          ],
+          "ms": 98
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "title": 13,
+            "semantic": 20
+          }
+        }
+      ]
+    },
+    {
+      "query": "纯音乐、史诗、睡前的歌",
+      "message": "（放宽了：去掉软偏好、放宽场景）为你找到以下歌曲：",
+      "relaxed": [
+        "去掉软偏好",
+        "放宽场景"
+      ],
+      "songs": [
+        {
+          "song_id": 2290107,
+          "name": "Emotional Experimental Cinematic",
+          "artist": "Sevennotes",
+          "moods": [
+            "史诗",
+            "平静",
+            "梦幻",
+            "神秘"
+          ],
+          "scenes": [
+            "学习",
+            "工作",
+            "深夜"
+          ],
+          "reason": "兼具史诗与平静氛围的电子配乐，适合睡前放松聆听。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 2273466,
+          "name": "5 - NOSTALGIE OCÉANE",
+          "artist": "Thierry TREMELET",
+          "moods": [
+            "史诗",
+            "平静",
+            "怀旧",
+            "梦幻"
+          ],
+          "scenes": [
+            "咖啡馆",
+            "深夜",
+            "睡前"
+          ],
+          "reason": "古典氛围中带着史诗与怀旧感，专为睡前时刻打造。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1080606,
+          "name": "Die Ballade vom Uhrwerk",
+          "artist": "FlauschGAU",
+          "moods": [
+            "史诗",
+            "神秘",
+            "紧张"
+          ],
+          "scenes": [
+            "学习",
+            "深夜"
+          ],
+          "reason": "古典风格的史诗配乐，神秘而深沉，适合深夜入眠。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 2283948,
+          "name": "8 - AU ROYAUME D'ATLANTIDE",
+          "artist": "Thierry TREMELET",
+          "moods": [
+            "史诗",
+            "梦幻",
+            "燃"
+          ],
+          "scenes": [
+            "旅行",
+            "深夜"
+          ],
+          "reason": "梦幻史诗的古典原声，深夜聆听如入亚特兰蒂斯之境。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        },
+        {
+          "song_id": 1399380,
+          "name": "StrinGIntensitY",
+          "artist": "Pranal Ingle",
+          "moods": [
+            "励志",
+            "史诗",
+            "平静"
+          ],
+          "scenes": [
+            "学习",
+            "工作",
+            "清晨"
+          ],
+          "reason": "平静而带史诗感的电子氛围，适合睡前静静感受。",
+          "match": {
+            "type": "semantic",
+            "line_no": null,
+            "line_text": null,
+            "start_ms": null
+          }
+        }
+      ],
+      "trace": [
+        {
+          "step": "intent",
+          "intents": [
+            "describe"
+          ],
+          "filters": {
+            "genres": [],
+            "moods": [
+              "史诗"
+            ],
+            "scenes": [
+              "睡前"
+            ],
+            "vocal": "instrumental",
+            "languages": [],
+            "duration_s": null
+          },
+          "soft_tags": [
+            "氛围",
+            "古典"
+          ],
+          "ms": 130
+        },
+        {
+          "step": "recall",
+          "sizes": {
+            "semantic": 1
+          }
+        },
+        {
+          "step": "rank",
+          "n": 1,
+          "top": [
+            2273466,
+            0.5789341168313135
+          ]
+        },
+        {
+          "step": "relax",
+          "applied": "去掉软偏好",
+          "n": 1
+        },
+        {
+          "step": "relax",
+          "applied": "放宽场景",
+          "n": 10
+        },
+        {
+          "step": "respond",
+          "n": 5
+        }
+      ]
+    }
+  ]
+}

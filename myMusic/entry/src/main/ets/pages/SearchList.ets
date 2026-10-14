@@ -160,7 +160,7 @@ struct songList {
       }) {
         ForEach(this.songList, (item: SongModel) => {
           Row() {
-            Image(Config.SERVER_URL + item.pic).width("260lpx").margin({ right: "34lpx" })
+            Image(Config.resolveUrl(item.pic)).width("260lpx").margin({ right: "34lpx" })
             Column() {
               if (this.type== 3) {
                 Text(item.title).fontSize("44lpx").fontWeight(FontWeight.Normal)

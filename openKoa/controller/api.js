@@ -81,8 +81,9 @@ exports.getListSongDetail = async (ctx, next) => {
     ctx.body = {code: 200, message:'歌单详情成功',data: newList}
 }
 // 6 带分页歌单所有列表
-exports. getAllSongList = async (ctx) => { 
-    const {page=1, pageSize=6} = ctx.query
+exports. getAllSongList = async (ctx) => {
+    const page = parseInt(ctx.query.page) || 1
+    const pageSize = parseInt(ctx.query.pageSize) || 6
     const songList = await SongList.findAll({
         limit: pageSize,   // 获取6条数据
         offset: (page - 1) * pageSize,  // 跳过多少条数据
@@ -91,8 +92,9 @@ exports. getAllSongList = async (ctx) => {
     ctx.body = {code: 200, message:'歌单所有列表成功',data: songList}
 }
 // 7. 带分页歌手所有列表
-exports.getAllSinger = async (ctx) => { 
-    const {page=1, pageSize=6} = ctx.query
+exports.getAllSinger = async (ctx) => {
+    const page = parseInt(ctx.query.page) || 1
+    const pageSize = parseInt(ctx.query.pageSize) || 6
     const singer = await Singer.findAll({
         limit: pageSize,   // 获取6条数据
         offset: (page - 1) * pageSize,  // 跳过多少条数据
@@ -103,7 +105,9 @@ exports.getAllSinger = async (ctx) => {
 
 // 8 带分页搜索歌曲searchSong
 exports.searchSong = async (ctx) => {
-    const {keywords,page=1, pageSize=3, type=1} = ctx.query
+    const {keywords, type=1} = ctx.query
+    const page = parseInt(ctx.query.page) || 1
+    const pageSize = parseInt(ctx.query.pageSize) || 3
     let list = null
     if(type == 1){  // 搜索歌曲
         list = await Song.findAll({
@@ -145,19 +149,29 @@ exports.searchSong = async (ctx) => {
     }
     ctx.body = {code: 200, message:'获取成功',data: datas}
 }
-// 通过Id ,获取歌曲详情 
+// 通过Id ,获取歌曲详情
 exports.getSongDetail = async (ctx) => {
     const {id}= ctx.request.query
-    console.log(id)
     const song = await Song.findAll({
-        where: {
-            id: id
-        },
-        include: [{
-            model: Singer
-        }]
+        where: { id: id },
+        include: [{ model: Singer }]
     })
     ctx.body = {code: 200, message:'获取成功',data: song}
+}
+
+// 9.1 音频流代理：302 跳转到 Jamendo tracks/file（契约 C5）
+//     公开接口；client_id 从 .env 读取，不落库、不进种子 SQL。
+exports.streamAudio = async (ctx) => {
+    const clientId = process.env.JAMENDO_CLIENT_ID
+    if (!clientId) {
+        ctx.status = 500
+        ctx.body = { code: 500, message: 'JAMENDO_CLIENT_ID 未配置' }
+        return
+    }
+    const { id } = ctx.params
+    const url = `https://api.jamendo.com/v3.0/tracks/file/?client_id=${clientId}`
+        + `&id=${encodeURIComponent(id)}&action=stream&audioformat=mp32`
+    ctx.redirect(url)
 }
 
 // 登录
@@ -338,6 +352,39 @@ exports.getUserInfo= async (ctx, next) =>{
     const userId = ctx.user.id
     let user = await Consumer.findOne({where:{id:userId}})
     ctx.body = {code: 200, message:"用户信息",data:{user}}
+}
+
+// 19 AI 搜歌（多轮）—— 转发到 Python Agent 服务，用 SSE 流式返回过程（阶段5）
+//     AGENT_URL 默认 http://127.0.0.1:8000（uvicorn agent.app:app）
+exports.agentChat = async (ctx) => {
+    const { message, sessionId = 'default' } = ctx.request.body || {}
+    if (!message) { ctx.status = 400; ctx.body = { code: 400, message: 'message 不能为空' }; return }
+    const agentUrl = process.env.AGENT_URL || 'http://127.0.0.1:8000'
+
+    ctx.respond = false                                   // 自己写 res，交给 Koa 之外
+    ctx.res.writeHead(200, {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+    })
+    const send = (event, data) => ctx.res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+
+    try {
+        send('status', { stage: 'understanding', text: '正在理解你的需求…' })
+        send('status', { stage: 'searching', text: '正在检索曲库…' })
+        const resp = await fetch(`${agentUrl}/agent/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-User-Id': String(ctx.user.id) },
+            body: JSON.stringify({ session_id: sessionId, query: message }),
+            signal: AbortSignal.timeout(20000),          // 阶段5顺手做：转发加超时
+        })
+        const json = await resp.json()
+        send('result', json.data || json)
+    } catch (e) {
+        send('error', { message: 'Agent 服务不可用: ' + (e.message || e) })
+    }
+    ctx.res.end()
 }
 
 // 获取AI推荐单曲（基于机器学习模型）

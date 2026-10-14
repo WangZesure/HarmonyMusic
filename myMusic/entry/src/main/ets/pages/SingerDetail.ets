@@ -77,7 +77,7 @@ struct SingerDetail {
           // 简介
           Row({ space: '16lpx' }) {
             Row() {
-              Image(Config.SERVER_URL+this.singerDetail.pic)
+              Image(Config.resolveUrl(this.singerDetail.pic))
                 .width('80%')
                 .opacity(0.8)
                 .fillColor('#ff5186')

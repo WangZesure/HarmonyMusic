@@ -1,0 +1,188 @@
+{
+  "baseline": {
+    "title": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "lyric": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe_fuzzy": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "absent": {
+      "refused": 1.0
+    },
+    "constraint": {
+      "satisfaction5": 1.0
+    },
+    "mood": {
+      "ndcg5": 1.0
+    }
+  },
+  "no_intent (原句直连 B2)": {
+    "title": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "lyric": {
+      "hit1": 0.125,
+      "mrr": 0.188,
+      "hit5": 0.25
+    },
+    "describe": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe_fuzzy": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "absent": {
+      "refused": 0.0
+    },
+    "constraint": {
+      "satisfaction5": 0.867
+    },
+    "mood": {
+      "ndcg5": 0.756
+    }
+  },
+  "no_lang_norm": {
+    "title": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "lyric": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe_fuzzy": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "absent": {
+      "refused": 1.0
+    },
+    "constraint": {
+      "satisfaction5": 1.0
+    },
+    "mood": {
+      "ndcg5": 1.0
+    }
+  },
+  "lyric_legacy (RRF+卡片重排)": {
+    "title": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "lyric": {
+      "hit1": 0.5,
+      "mrr": 0.525,
+      "hit5": 0.625
+    },
+    "describe": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe_fuzzy": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "absent": {
+      "refused": 1.0
+    },
+    "constraint": {
+      "satisfaction5": 1.0
+    },
+    "mood": {
+      "ndcg5": 1.0
+    }
+  },
+  "no_artist": {
+    "title": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "lyric": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe_fuzzy": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "absent": {
+      "refused": 0.333
+    },
+    "constraint": {
+      "satisfaction5": 1.0
+    },
+    "mood": {
+      "ndcg5": 1.0
+    }
+  },
+  "no_fuzzy": {
+    "title": {
+      "hit1": 0.667,
+      "mrr": 0.667,
+      "hit5": 0.667
+    },
+    "lyric": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "describe_fuzzy": {
+      "hit1": 1.0,
+      "mrr": 1.0,
+      "hit5": 1.0
+    },
+    "absent": {
+      "refused": 1.0
+    },
+    "constraint": {
+      "satisfaction5": 1.0
+    },
+    "mood": {
+      "ndcg5": 1.0
+    }
+  }
+}

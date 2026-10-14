@@ -1,0 +1,74 @@
+# ------------------------------------------------------------------ #
+# Secrets / local config — never commit
+# ------------------------------------------------------------------ #
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------------ #
+# Python (data_pipeline / agent / recommend)
+# ------------------------------------------------------------------ #
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# ------------------------------------------------------------------ #
+# Node (openKoa)
+# ------------------------------------------------------------------ #
+node_modules/
+
+# ------------------------------------------------------------------ #
+# HarmonyOS / DevEco (myMusic)
+# ------------------------------------------------------------------ #
+oh_modules/
+.hvigor/
+.cxx/
+build/
+local.properties
+.clangd
+.clang-format
+.clang-tidy
+.appanalyzer
+.test
+
+# ------------------------------------------------------------------ #
+# Downloaded models / large resources (HF_HOME, bge-m3, reranker)
+# ------------------------------------------------------------------ #
+resources/
+
+# ------------------------------------------------------------------ #
+# Data pipeline artifacts — large / regenerable (raw JSON, LRC, index,
+# LLM cache, agent logs). Curated deliverables live in DocsForMusicAgent/.
+# ------------------------------------------------------------------ #
+data_pipeline/data/
+
+# recommend model artifacts
+recommend/models/
+recommend/data/raw/
+recommend/data/processed/
+
+# ------------------------------------------------------------------ #
+# Logs / temp
+# ------------------------------------------------------------------ #
+*.log
+*.tmp
+*.temp
+*.swp
+
+# ------------------------------------------------------------------ #
+# OS / editor noise
+# ------------------------------------------------------------------ #
+.DS_Store
+._*
+__MACOSX/
+.idea/
+.vscode/
+Thumbs.db
+ehthumbs.db

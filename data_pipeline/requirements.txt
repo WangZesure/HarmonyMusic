@@ -1,0 +1,9 @@
+# Stage-1 pipeline deps: fetching, caching, LLM tagging, DB load.
+# Install: pip install -r data_pipeline/requirements.txt
+requests>=2.32
+python-dotenv>=1.0
+PyYAML>=6.0
+tqdm>=4.66
+tenacity>=8.2
+openai>=1.40          # DeepSeek is OpenAI-compatible (base_url override)
+pymysql>=1.1

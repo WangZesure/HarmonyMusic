@@ -17,9 +17,28 @@ withRecommend/
 ├── myMusic/           # 鸿蒙移动端应用
 ├── openKoa/          # Node.js后端API服务
 ├── recommend/        # Python AI推荐系统
+├── agent/            # 搜歌 Agent（意图解析 + 多路召回 + 重排 + 多轮）
+├── data_pipeline/    # 阶段1数据流水线（Jamendo 拉取/歌词对齐/打标签/入库/建索引）
+├── db/               # 数据库结构 schema_v1.sql + 种子 seed_v1.sql + 自检 check_v1.sql
+├── resources/        # 本地模型缓存（bge-m3 / bge-reranker，gitignored）
 ├── music.sql         # MySQL数据库初始化脚本
 └── README.md         # 项目文档
 ```
+
+## 🎯 AI 搜歌 Agent（`agent/`）
+
+在 500 首 Jamendo 曲库上的自然语言搜歌 Agent：把「下雨天听的伤感歌」「有句歌词是……」「换一首」这类请求，
+解析成结构化约束后**多路检索**（关键词 BM25 / 歌词（中英双语）检索 / 向量语义检索），融合、硬约束过滤、
+交叉编码重排，并在查不到时**拒答**而不是编造。
+
+- 数据底座与评测见 `DocsForMusicAgent/`（`phase12_report.md`、`phase3_report.md`、契约 `contracts_v1.md`）。
+- 服务：`uvicorn agent.app:app --port 8000`（工具层 `/tool/{name}`、单轮 `/agent/search`、多轮 `/agent/chat`）；
+  用带 torch 的解释器 `D:\apps\tools\Conda\python.exe` 运行。
+- App 接入：Koa `POST /agent/chat`（JWT + SSE 流式）→ 鸿蒙 `pages/AiSearch.ets`「AI 搜歌」页。
+
+**评测（dev 109 / test 74，k=5）**：三类合并 Hit@5 = **1.00**；曲库没有时拒答率 **1.00**；编造率 0。
+对比基线：整库入 prompt(B1) 0.61、单次向量(B2) 0.78（test 上均低于本 Agent）。详见 `phase3_report.md`。
+
 
 ## ✨ 核心功能
 

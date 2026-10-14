@@ -1,0 +1,260 @@
+# 中文受控标签词表 v3 (contract C3)
+#
+# 06_llm_tagging.py lets DeepSeek pick tags ONLY from genre/mood/scene below;
+# anything outside is discarded in code.
+#
+# v3 (per contracts_v1.md C3):
+#   * removed the `voice` class — "有人声/纯音乐" lives in song_meta.vocal and the
+#     language in song_meta.language (single-valued facts, not tags);
+#   * kept only genre / mood / scene, values are the Chinese literal used in the
+#     DB, tool enums and prompts alike (no English keys);
+#   * added `aliases` (colloquial -> canonical) for阶段3 intent parsing;
+#   * added `language_display` for展示 and intent parsing.
+# After 06, tags with <5 songs get pruned or downgraded to an alias (C3.3).
+
+version: 3
+
+tag_types: [genre, mood, scene]
+
+genre:            # 风格
+  - 流行
+  - 摇滚
+  - 民谣
+  - 电子
+  - 说唱
+  - R&B
+  - 爵士
+  - 古典
+  - 金属
+  - 朋克
+  - 乡村
+  - 拉丁
+  - 世界音乐
+  - 氛围
+  - 原声配乐
+  - 舞曲
+  - 雷鬼
+  - 蓝调
+  - 灵魂乐
+  - 放克
+  - 独立
+  - 中国风
+  - 儿童
+  - 节日
+
+mood:             # 情绪
+  - 开心
+  - 伤感
+  - 平静
+  - 治愈
+  - 燃
+  - 浪漫
+  - 怀旧
+  - 孤独
+  - 温暖
+  - 忧郁
+  - 梦幻
+  - 神秘
+  - 愤怒
+  - 希望
+  - 励志
+  - 失落
+  - 慵懒
+  - 甜美
+  - 紧张
+  - 史诗
+
+scene:            # 场景
+  - 跑步
+  - 健身
+  - 学习
+  - 工作
+  - 通勤
+  - 开车
+  - 雨天
+  - 深夜
+  - 清晨
+  - 睡前
+  - 派对
+  - 咖啡馆
+  - 旅行
+  - 散步
+  - 恋爱
+  - 失恋
+  - 婚礼
+
+# 口语说法 -> 标准标签 (阶段3 意图解析 + 阶段4 多轮修改直接用)
+aliases:
+  emo: 伤感
+  难过得歌: 伤感
+  催泪: 伤感
+  丧: 忧郁
+  忧伤: 忧郁
+  网抑云: 忧郁
+  嗨: 燃
+  燃爆: 燃
+  带感: 燃
+  上头: 燃
+  激情: 燃
+  激昂: 燃
+  动感: 燃
+  chill: 慵懒
+  chill一点: 慵懒
+  摸鱼: 慵懒
+  助眠: 睡前
+  催眠: 睡前
+  打瞌睡: 睡前
+  元气: 励志
+  正能量: 励志
+  打鸡血: 励志
+  甜甜的: 甜美
+  疗愈: 治愈
+  撸铁: 健身
+  慢跑: 跑步
+  开车听: 开车
+  码代码: 工作
+  写作业: 学习
+  欢快: 开心
+  轻快: 开心
+  快乐: 开心
+  开心点: 开心
+  舒缓: 平静
+  放松: 平静
+  安静: 平静
+  安静点: 平静
+  温柔: 温暖
+  温暖点: 温暖
+
+# ISO 639-1 -> 中文展示名
+language_display:
+  en: 英文
+  zh: 中文
+  yue: 粤语
+  fr: 法文
+  es: 西班牙文
+  de: 德文
+  it: 意大利文
+  pt: 葡萄牙文
+  ru: 俄文
+  ja: 日文
+  ko: 韩文
+  zxx: 纯音乐
+  und: 未知
+
+# --- Jamendo vartags -> Chinese mood/scene (prior for source=jamendo tags) ---
+jamendo_vartag_map:
+  # positive / energy
+  happy: [开心]
+  joyful: [开心]
+  cheerful: [开心, 温暖]
+  upbeat: [开心]
+  groovy: [开心]
+  celebration: [开心, 派对]
+  fun: [开心, 派对]
+  summer: [开心]
+  energetic: [燃]
+  powerful: [燃, 史诗]
+  intense: [燃, 紧张]
+  action: [燃]
+  adventure: [燃, 旅行]
+  aggressive: [愤怒, 燃]
+  angry: [愤怒]
+  # calm / warm
+  calm: [平静]
+  peaceful: [平静]
+  cool: [平静, 慵懒]
+  smooth: [平静]
+  soft: [温暖, 平静]
+  mellow: [平静, 慵懒]
+  chill: [平静, 慵懒]
+  lounge: [慵懒, 平静]
+  laidback: [慵懒]
+  relaxed: [平静, 治愈]
+  relaxing: [平静, 治愈]
+  meditative: [平静, 治愈]
+  meditation: [平静, 治愈]
+  spa: [治愈, 平静]
+  healing: [治愈]
+  # dreamy / dark
+  dreamy: [梦幻]
+  atmospheric: [梦幻, 平静]
+  ethereal: [梦幻]
+  psychedelic: [梦幻]
+  mysterious: [神秘]
+  scifi: [神秘, 梦幻]
+  dark: [忧郁, 神秘]
+  haunting: [忧郁, 神秘]
+  # sad / nostalgic
+  sad: [伤感]
+  melancholic: [伤感, 忧郁]
+  emotional: [伤感]
+  sentimental: [伤感, 怀旧]
+  ballad: [伤感, 浪漫]
+  bittersweet: [伤感, 怀旧]
+  nostalgic: [怀旧]
+  retro: [怀旧]
+  80s: [怀旧]
+  90s: [怀旧]
+  # motivational / epic
+  uplifting: [励志, 希望]
+  hopeful: [希望]
+  inspirational: [励志]
+  inspiring: [励志]
+  motivational: [励志]
+  triumphant: [史诗, 励志]
+  epic: [史诗]
+  dramatic: [史诗]
+  drama: [史诗]
+  cinematic: [史诗]
+  # romantic
+  romantic: [浪漫]
+  love: [浪漫, 恋爱]
+  sensual: [浪漫]
+  sexy: [浪漫]
+  # scene
+  party: [派对]
+  clubbing: [派对]
+  travel: [旅行]
+  sport: [跑步, 健身]
+  workout: [健身]
+
+# --- Jamendo genres -> Chinese genre (prior for source=jamendo tags) ---
+jamendo_genre_map:
+  pop: [流行]
+  indiepop: [流行, 独立]
+  poprock: [摇滚, 流行]
+  electropop: [电子, 流行]
+  synthpop: [电子, 流行]
+  rock: [摇滚]
+  indierock: [摇滚, 独立]
+  alternativerock: [摇滚]
+  indie: [独立]
+  electronic: [电子]
+  electronica: [电子]
+  experimental: [电子]
+  edm: [电子, 舞曲]
+  house: [电子, 舞曲]
+  deephouse: [电子, 舞曲]
+  techno: [电子, 舞曲]
+  dance: [舞曲]
+  disco: [舞曲, 放克]
+  funk: [放克]
+  soul: [灵魂乐]
+  rnb: [R&B]
+  hiphop: [说唱]
+  rap: [说唱]
+  jazz: [爵士]
+  classical: [古典]
+  folk: [民谣]
+  singersongwriter: [民谣]
+  latin: [拉丁]
+  world: [世界音乐]
+  reggae: [雷鬼]
+  metal: [金属]
+  ambient: [氛围, 电子]
+  chillout: [氛围, 电子]
+  downtempo: [氛围, 电子]
+  newage: [氛围]
+  lofi: [氛围, 电子]
+  filmscore: [原声配乐]
+  trailer: [原声配乐]

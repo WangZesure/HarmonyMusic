@@ -207,7 +207,7 @@ struct UserEdit {
               .backgroundColor(Color.Grey)
               .margin({ top: 20 })
           }else{
-            Image(`${Config.SERVER_URL}${this.userInfo.avatar}`).width("148lpx").height("148lpx").borderRadius("74lpx")
+            Image(Config.resolveUrl(this.userInfo.avatar)).width("148lpx").height("148lpx").borderRadius("74lpx")
           }
         }
         .onClick(()=>{

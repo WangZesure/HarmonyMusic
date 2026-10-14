@@ -43,7 +43,7 @@ export struct Comment {
                   Column() {
                     Row({ space: '24lpx' }) {
                       Row() {
-                        Image(Config.SERVER_URL + item.consumer.avatar)
+                        Image(Config.resolveUrl(item.consumer.avatar))
                           .borderRadius('80lpx')
                           .width('80lpx')
                       }
@@ -106,7 +106,7 @@ export struct Comment {
               ListItem() {
                 Row({ space: '24lpx' }) {
                   Row() {
-                    Image(Config.SERVER_URL + item.consumer.avatar)
+                    Image(Config.resolveUrl(item.consumer.avatar))
                       .borderRadius('80lpx')
                       .width('80lpx')
                   }
@@ -120,7 +120,7 @@ export struct Comment {
                       .fontSize('24lpx')
                     // 音乐卡片
                     Row() {
-                      Image(Config.SERVER_URL + item.song.pic)
+                      Image(Config.resolveUrl(item.song.pic))
                         .width('120lpx')
                         .aspectRatio(1)
                       Column({ space: '20lpx' }) {

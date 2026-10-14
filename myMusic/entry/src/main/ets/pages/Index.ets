@@ -173,6 +173,16 @@ struct Index {
             }
           })
       }
+
+      // AI 搜歌入口
+      Button('AI 搜歌')
+        .fontSize('22lpx')
+        .height('56lpx')
+        .backgroundColor('#753061')
+        .position({ x: '74%', y: '70lpx' })
+        .onClick(() => {
+          router.pushUrl({ url: 'pages/AiSearch' })
+        })
     }
     .width('100%')
     .height('100%')

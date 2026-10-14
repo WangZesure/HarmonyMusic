@@ -46,6 +46,10 @@ router.get('/searchSong', controller.searchSong)
 // 9. 歌曲详情
 router.get('/getSongDetail', controller.getSongDetail)
 
+// 9.1 音频流：302 跳转到 Jamendo，client_id 从 .env 读取（契约 C5）
+//     公开接口，不加 verifyToken —— AVPlayer 播放时不会带 token。
+router.get('/stream/:id', controller.streamAudio)
+
 
 // 10登录
 router.post('/login',controller.login)
@@ -81,5 +85,7 @@ router.post('/uploads',upload.single('file'),async (ctx,next)=>{
   ctx.body = {code:200,message:'上传成功',data:file.filename}
 })
 
+// 19 AI 搜歌（多轮对话）SSE 流式；鉴权复用现有 JWT 中间件（阶段5）
+router.post('/agent/chat', verifyToken(), controller.agentChat)
 
 module.exports = router

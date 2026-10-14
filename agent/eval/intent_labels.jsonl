@@ -1,0 +1,50 @@
+{"id": "dev-000", "query": "那个德语说唱 Ritueller Missbrach 是谁唱的来着？", "expected_intent": {"intents": ["title"], "title": "Ritueller Missbrauch"}}
+{"id": "dev-001", "query": "NDNL 的 YASI 这首歌好适合深夜听啊", "expected_intent": {"intents": ["title"], "title": "YASI"}}
+{"id": "dev-002", "query": "想找一首Christian Petermann的Huyana，适合深夜听的氛围音乐", "expected_intent": {"intents": ["title"], "title": "Huyana"}}
+{"id": "dev-003", "query": "有人知道Clouds Fly As I Smle这首歌吗？Matti Paalanen的，听着特别温暖", "expected_intent": {"intents": ["title"], "title": "Clouds Fly As I Smile"}}
+{"id": "dev-004", "query": "想听 heiwr 的 Quatro Paredes，那首很浪漫的葡语情歌", "expected_intent": {"intents": ["title"], "title": "Quatro Paredes"}}
+{"id": "dev-005", "query": "The.madpix.project 的 Do You Ever Feel Sorry 这首歌在哪能听？", "expected_intent": {"intents": ["title"], "title": "Do You Ever Feel Sorry"}}
+{"id": "dev-006", "query": "帮我找一下Andrey Faustov的Diabla这首歌", "expected_intent": {"intents": ["title"], "title": "Diabla"}}
+{"id": "dev-007", "query": "Gölden Palace 的 Bleed Me Dry 这首歌在哪能听？", "expected_intent": {"intents": ["title"], "title": "Bleed Me Dry"}}
+{"id": "dev-008", "query": "帮我找一下Yigit Atilla的Palm Trees这首歌", "expected_intent": {"intents": ["title"], "title": "Palm Trees"}}
+{"id": "dev-009", "query": "有人听过 Briareus 的 The Cold Comfort of Desparation 吗？电子摇滚那首，听着好丧", "expected_intent": {"intents": ["title"], "title": "The Cold Comfort of Desperation"}}
+{"id": "dev-010", "query": "求一首歌，叫 Africa The Cradel of Life (Epic Version)，是 Grégoire Lourme 唱的，很有史诗感", "expected_intent": {"intents": ["title"], "title": "Africa The Cradle of Life (Epic Version)"}}
+{"id": "dev-011", "query": "Pigamma sound 的 Radici 这首歌讲的是什么意思？", "expected_intent": {"intents": ["title"], "title": "Radici"}}
+{"id": "dev-012", "query": "求一首叫 Night Str 的歌，Sergey Gulevich 唱的，梦幻电子那种", "expected_intent": {"intents": ["title"], "title": "Night Star"}}
+{"id": "dev-013", "query": "想听En-Studio的At the Edge of the Earth，有吗？", "expected_intent": {"intents": ["title"], "title": "At the Edge of the Earth"}}
+{"id": "dev-014", "query": "有人听过 Briareus 的 Spiritt 吗？就是那首很空灵的爵士歌", "expected_intent": {"intents": ["title"], "title": "Spirit"}}
+{"id": "dev-015", "query": "有时候没有你我简直无法呼吸", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-016", "query": "有句英文歌词是 You told me i'm lost in my shelter，中文意思是什么歌", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-017", "query": "它会冲走他们的想法和话语吧", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-018", "query": "我感觉自己老了，无法掌控自己的生活", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-019", "query": "记得有一句歌词是‘在她心里从出生就有条裂缝’，好像是俄语歌，原词怎么唱的？", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-020", "query": "时间正在流逝 歌词", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-021", "query": "在离地面三英尺的地方", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-022", "query": "我好像现在能听到你了，转身像呼唤般伸出手", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-023", "query": "有一首歌歌词是 I search for the strength", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-024", "query": "因为你来了 天空放晴 歌词", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-025", "query": "有一首歌歌词是Certains adultes errent entre promesse et mensonges，请问是什么歌？", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-026", "query": "Ты на сердце тату, не стал сводить тебя 这句歌词是什么歌", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-027", "query": "有首歌歌词是我不再知道自己是谁也不再知道自己能做什么", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-028", "query": "有一句歌词是 on the roof with a pipe and writing 的歌叫什么", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-029", "query": "透过窗玻璃看日子一成不变", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-030", "query": "那艘让我自由的船，带我逃离过去的阴影", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-031", "query": "我的脑海里思绪像大麻一样旋转，我像赤道一样环游世界却坐在我的客厅里……思绪旋转，像陀螺一样转……我不再相信任何人，他们只说谎话，想着用楼梯而不是电梯到达高处，因为努力终将回报你的付出", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-032", "query": "do we have to store up all our hope for the next life 歌词", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-033", "query": "当两人都不打算停止相爱的时候", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-034", "query": "就是那个时候月光照在水面上吧", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-035", "query": "your mouth is moving and I think you are talking to me 这句歌词是哪首歌", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-036", "query": "有句歌词是 But you're showing up late to the party 的歌叫什么", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-037", "query": "今晚我最好只喝水不喝酒 歌词", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-038", "query": "Et bien sûr, je me souviens que tu me disais tous les jours 这句歌词是哪首歌", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-039", "query": "Não haveria melhor testemunha ocular 这句歌词是哪首歌", "expected_intent": {"intents": ["lyric"], "lyric_query": true}}
+{"id": "dev-040", "query": "意大利独立民谣 忧郁伤感 深夜失恋 离别思念 灰烬", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-041", "query": "深夜听的心碎俄语情歌 回忆背叛与逝去的爱 伤感民谣", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-042", "query": "求一首电子说唱风格的伤感失恋歌曲，深夜独自借酒消愁，孤独又无奈", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-043", "query": "一首幽默慵懒的法语爵士民谣，讲网恋奔现时忐忑又浪漫的心情，适合深夜听", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-044", "query": "求一首电子浩室风格的治愈励志歌曲，深夜开车或散步时听，歌词有'come whatever may it's gonna be okay'和'we are all made of stars'，充满希望与梦幻感", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-045", "query": "求一首意大利语歌曲，用树根比喻人生旅程和爱的考验，旋律温暖又带伤感，适合深夜听，充满希望和旅行感", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-046", "query": "求一首梦幻氛围的电子情歌，浪漫治愈，适合深夜睡前听，像夜星坠落般的感觉", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-047", "query": "求一首深情忧伤的流行歌，唱的是深夜追问恋人是否感到孤独与歉意，旋律伤感动人", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-048", "query": "轻快治愈的独立摇滚，适合散步和派对，浪漫又开心", "expected_intent": {"intents": ["describe"]}}
+{"id": "dev-049", "query": "求一首说唱风格的伤感失恋歌曲，深夜一个人听的那种，歌词讲心碎和无尽思念，想回到过去", "expected_intent": {"intents": ["describe"]}}

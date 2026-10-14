@@ -1,0 +1,7 @@
+# GPU-server-only deps for step 04 (lyric forced alignment).
+# Install on the machine that has the GPU, not necessarily your dev box.
+#   pip install -r data_pipeline/requirements-gpu.txt
+torch
+demucs            # vocal/instrumental separation before alignment
+stable-ts         # forced alignment built on openai-whisper (large-v3)
+faster-whisper    # ASR fallback for low-confidence LRC

@@ -7,7 +7,7 @@ export default struct PlayerNav {
   build() {
     Row() {
       Row({space:'20lpx'}) {
-        Image(Config.SERVER_URL+this.playState.pic)
+        Image(Config.resolveUrl(this.playState.pic))
           .width('80lpx')
           .aspectRatio(1)
         Column() {

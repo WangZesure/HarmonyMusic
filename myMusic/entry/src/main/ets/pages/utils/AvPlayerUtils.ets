@@ -5,6 +5,7 @@ import { defaultState, PlayStateType } from '../model/PlayStateModel'
 import { EmitEventType } from '../model/paramModel'
 import router from '@ohos.router'
 import playService  from './PlayService'
+import { ConfigUtil } from '../common/ConfigUtil'
 /**
  * 播放工具类
  */
@@ -149,7 +150,8 @@ export class AvPlayerUtils{
     AvPlayerUtils.duration = 0
     AvPlayerUtils.time = 0
     console.log(AvPlayerUtils.playList[AvPlayerUtils.playIndex].url)
-    AvPlayerUtils.player.url='http://192.168.43.21:3000/uploads'+ AvPlayerUtils.playList[AvPlayerUtils.playIndex].url
+    // 契约 C5：统一用 resolveUrl 解析（/stream/{id} -> Config.SERVER，外链直接用）
+    AvPlayerUtils.player.url = ConfigUtil.resolveUrl(AvPlayerUtils.playList[AvPlayerUtils.playIndex].url)
   }
   //发布通知，订阅者就可以得到数据  emitter.emit 发布 （重要重要）
   // 更新歌曲信息至页面

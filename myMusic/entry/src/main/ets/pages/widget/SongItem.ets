@@ -39,7 +39,7 @@ export struct SongItem {
 
       // 列表
       Row({ space: '20lpx' }) {
-        Image(Config.SERVER_URL+this.item.pic)
+        Image(Config.resolveUrl(this.item.pic))
           .width('36lpx')
           .aspectRatio(1)
           .borderRadius('8lpx')

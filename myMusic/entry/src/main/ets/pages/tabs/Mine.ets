@@ -100,7 +100,7 @@ export struct Mine {
       //用户头像 和用户名
       Row() {
         if (this.isLogin) {
-          Image(`${Config.SERVER_URL}${this.userInfo.avatar}`).width("148lpx").height("148lpx").borderRadius("74lpx")
+          Image(Config.resolveUrl(this.userInfo.avatar)).width("148lpx").height("148lpx").borderRadius("74lpx")
         } else {
           Image($r("app.media.user")).width("148lpx").height("148lpx").borderRadius("74lpx").onClick(() => {
             router.pushUrl({

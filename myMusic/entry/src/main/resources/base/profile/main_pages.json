@@ -10,7 +10,8 @@
     "pages/Login",
     "pages/SongsDetail",
     "pages/Play",
-    "pages/UserEdit"
+    "pages/UserEdit",
+    "pages/AiSearch"
 
   ]
 }
