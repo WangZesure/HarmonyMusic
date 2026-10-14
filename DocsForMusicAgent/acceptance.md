@@ -32,6 +32,7 @@
 ## 5. 接入 App
 - 交付：`openKoa/routes|controller`(`/agent/chat` SSE+JWT)、`myMusic/.../pages/AiSearch.ets`、`main_pages.json`、`Index.ets` 入口
 - 验证（后端已实测）：`uvicorn agent.app:app --port 8000` + `node openKoa/bin/www` → `login` → `POST /agent/chat`（SSE `status→result`）
+- **一键端到端验收**：`D:\apps\tools\Conda\python.exe -m agent.e2e_smoke` → **12/12 passed**（直连 `/agent/search`、登录 JWT、SSE、歌词会话多轮「换一首/更X一点/不要伤感」、拒答不回退）。两个服务要先起着。
 - ⚠️ 客户端需 **DevEco Studio** 编译/真机验证（本环境无）
 - 证据：`phase5_report.md`
 
@@ -49,7 +50,9 @@ D:\apps\tools\Conda\python.exe -m pip install -r data_pipeline/requirements.txt 
 D:\apps\tools\Conda\python.exe -m uvicorn agent.app:app --port 8000
 # 3) Koa 后端
 node openKoa/bin/www            # :3000
-# 4) 客户端：DevEco 打开 myMusic，装到设备/模拟器，首页点「AI 搜歌」
+# 4) 一键端到端验收（两个服务都在跑时）
+D:\apps\tools\Conda\python.exe -m agent.e2e_smoke        # 期望 12/12 passed
+# 5) 客户端：DevEco 打开 myMusic，装到设备/模拟器，首页点「AI 搜歌」
 ```
 
 ## 未验证 / 需你环境
