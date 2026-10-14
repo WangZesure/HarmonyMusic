@@ -14,7 +14,7 @@
 
 ## 2. 工具层
 - 交付：`agent/tools/*`（8 工具）、`agent/registry.py`、`agent/app.py`(`/tool/{name}`)
-- 验证：`python -m agent.cli list`；`python -m pytest agent/tests -q`（21 passed）；`python -m agent.eval.eval_tools`（歌词混合 Top-5 0.94、标签一致性 1.0）
+- 验证：`python -m agent.cli list`；`python -m pytest agent/tests -q`（22 passed）；`python -m agent.eval.eval_tools`（歌词混合 Top-5 0.94、标签一致性 1.0）
 - 证据：`phase12_report.md`、`agent/README.md`
 
 ## 3. Agent 核心（单轮）
@@ -26,6 +26,7 @@
 ## 4. 多轮与记忆
 - 交付：`agent/core/{chat,session}.py`、`POST /agent/chat`
 - 验证：`python -m agent.core`... 或用 `agent.cli`/`pytest agent/tests`（含 `test_chat.py`）；示例：`来点深夜伤感的歌` → `换一首`（不重合）→ `更欢快一点`（换标签）
+- **已端到端复测（2026-10-14，经 Koa SSE 实调）**：`有首歌歌词是 I search for the strength` → `换一首`（5 首、与首轮 0 重合）→ `更欢快一点`（5 首）→ `不要伤感`（5 首）；`Coldplay 的 Yellow` 仍正确拒答。**该轮复测发现并修复了 F7**（歌词会话的续轮原本全部返回 0 首，见 `phase4_report.md` §2.1）。
 - 证据：`phase4_report.md`
 
 ## 5. 接入 App

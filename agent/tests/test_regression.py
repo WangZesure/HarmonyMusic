@@ -66,3 +66,18 @@ def test_typo_title_found():
     it = Intent(intents=["title"], title="Night Str", artist="Sergey Gulevich")
     ids = rank_ids("", intent_override=it)
     assert 1693791 in ids[:5], f"'Night Str' should find 'Night Star': {ids[:3]}"
+
+
+def test_f7_continuation_turn_not_refused():
+    """F7 (found in the 2026-10-14 end-to-end Koa run): '换一首' on a lyric query
+    excludes the top hits, so the best REMAINING lyric score (0.71) sat below the
+    frozen LYRIC_MIN_CONF (0.75) and the user got '不太确定你想找的是哪首' instead of
+    more songs — same for '更X一点', which narrows the pool. Continuations are a
+    re-slice of an already-answered query, so they gate at CONTINUATION_MIN."""
+    from agent.core import verify
+    it = Intent(intents=["lyric"], lyric_fragment="I search for the strength")
+    full = rank_ids("", intent_override=it)
+    assert full, "precondition: this query is confidently answerable on turn 1"
+    more_ids = rank_ids("", exclude=full, intent_override=it, gate=False)
+    assert more_ids, "'换一首' must return more songs instead of refusing"
+    assert verify.CONTINUATION_MIN < verify.LYRIC_MIN_CONF

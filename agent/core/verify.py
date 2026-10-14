@@ -7,6 +7,14 @@ from agent.models import Filter
 # Named-entity / relevance thresholds
 NAME_MIN_BM25 = 1.0      # BM25 score for title/artist route to count as "found"
 RELEVANCE_MIN = 0.30     # sigmoid rerank score below which we say "不太确定"
+# Continuation turns (换一首 / 更X一点 / 不要X) gate at this floor instead of the full
+# threshold. The gate's job — "did the user quote a lyric we can't place?" — is a
+# FIRST-turn risk; re-applying it to a re-slice of an already-answered query produces
+# nonsense refusals: "换一首" excludes the top hit, so the best REMAINING lyric score
+# (0.71) fell below LYRIC_MIN_CONF (0.75) and the user got "不太确定你想找的是哪首"
+# instead of more songs ("更X一点" narrows the pool and fails the same way).
+# Low on purpose: a genuinely empty re-slice still refuses.
+CONTINUATION_MIN = RELEVANCE_MIN
 
 # FROZEN (2026-10-14, architect §7 fallback): the "认出处" (lyric_source) approach was
 # built and dev-passed, but the run-once holdout showed in-corpus misrecognition = 2

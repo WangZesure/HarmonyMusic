@@ -11,8 +11,11 @@ from agent.core import verify
 from agent.core.intent import parse
 
 
-def _run(query: str, exclude=None, extra_soft=None, intent_override=None):
-    """①→④. Returns (intent, ranked, matches, relaxed, trace, refuse_message|None)."""
+def _run(query: str, exclude=None, extra_soft=None, intent_override=None, gate: bool = True):
+    """①→④. Returns (intent, ranked, matches, relaxed, trace, refuse_message|None).
+
+    `gate=False` (continuation turns: 换一首 / 更X一点 / 不要X) lowers the confidence
+    threshold to `CONTINUATION_MIN` — see verify.CONTINUATION_MIN for why."""
     trace = []
     exclude = set(exclude or ())
 
@@ -39,7 +42,7 @@ def _run(query: str, exclude=None, extra_soft=None, intent_override=None):
 
     relaxed: list[str] = []
     is_lyric = bool(intent.lyric_fragment or "lyric" in intent.intents)
-    thr = verify.LYRIC_MIN_CONF if is_lyric else verify.RELEVANCE_MIN
+    thr = (verify.LYRIC_MIN_CONF if is_lyric else verify.RELEVANCE_MIN) if gate else verify.CONTINUATION_MIN
 
     if verify.named_not_found(intent, routes):
         who = intent.title or intent.artist
@@ -99,18 +102,19 @@ def _run(query: str, exclude=None, extra_soft=None, intent_override=None):
     return cur, ranked, matches, relaxed, trace, None, False
 
 
-def rank_ids(query: str, exclude=None, extra_soft=None, intent_override=None, flag: dict | None = None) -> list[int]:
+def rank_ids(query: str, exclude=None, extra_soft=None, intent_override=None,
+             flag: dict | None = None, gate: bool = True) -> list[int]:
     """Ranked song ids only (no reason generation) — for eval/ablation.
     `flag` (optional) receives {"gray": bool} so the eval can count gray separately."""
-    intent, ranked, _m, _r, _t, refuse, gray = _run(query, exclude, extra_soft, intent_override)
+    intent, ranked, _m, _r, _t, refuse, gray = _run(query, exclude, extra_soft, intent_override, gate)
     if flag is not None:
         flag["gray"] = gray
     return [] if refuse else [s for s, _ in ranked][: intent.count]
 
 
 def search(query: str, user_id: int | None = None, exclude=None,
-           extra_soft=None, intent_override=None) -> dict:
-    intent, ranked, matches, relaxed, trace, refuse, gray = _run(query, exclude, extra_soft, intent_override)
+           extra_soft=None, intent_override=None, gate: bool = True) -> dict:
+    intent, ranked, matches, relaxed, trace, refuse, gray = _run(query, exclude, extra_soft, intent_override, gate)
     if refuse:
         return _result([], refuse, relaxed, trace)
     songs, message, reason_error = respond_mod.build(intent, ranked, matches, user_id=user_id)  # ⑤

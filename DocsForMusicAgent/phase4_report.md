@@ -29,7 +29,40 @@ turn2  换一首            -> more    与 turn1 重合 0 首（已排除）
 turn3  更欢快一点        -> refine  moods 出现 开心/燃
 ```
 
-`pytest agent/tests` → **14 passed**（含 `test_chat.py`：指令分类、会话隔离）。
+`pytest agent/tests` → **22 passed**（含 `test_chat.py`：指令分类、会话隔离；`test_regression.py`：F7）。
+
+### 2.1 **F7（2026-10-14 端到端复测时发现，已修）——歌词会话的「换一首 / 更X一点」全部返回 0 首**
+
+**上面那张表为什么没发现它**：测的是**氛围类（mood）查询**，走 `RELEVANCE_MIN=0.30`；而 F7 只在**歌词类**会话上出现——歌词查询用 `LYRIC_MIN_CONF=0.75` 这一严格得多的闸门。**测例选型把它盖住了。**
+
+**复现**（经 Koa 实际调用）：
+
+```
+turn1  有首歌歌词是 I search for the strength  -> new     5 首
+turn2  换一首                                 -> more    0 首   「不太确定你想找的是哪首，能再具体描述一下吗？」
+turn3  更欢快一点                              -> refine  0 首   同上
+```
+
+**根因**：置信度闸门被作用在**被削过的候选池**上。它的职责是判断“用户引的这句歌词我们认不认得”（**首轮**风险），但续轮把它又跑了一遍：
+
+- `换一首` 传 `exclude=已展示`，把首轮那批高分歌排掉，**剩下的最高分**是 0.7104；
+- `更X一点` 用 mood 过滤把池子收窄，最高分**同样是** 0.7104（observed trace：`rank n=8, top [2229014, 0.7104]`）。
+
+两者都 < 0.75 → 拒答。**首轮答案是 5 首歌，续轮却回一句“不太确定你想找的是哪首”，是荒谬的**（用户要的是“再来一首”，不是重新描述需求）。
+
+**修法**：续轮（`more` / `refine` / `negative`）改用 `verify.CONTINUATION_MIN`（= `RELEVANCE_MIN` = 0.30）而不是完整阈值——**闸门只管首轮**，续轮是对**已判定可答**的结果集重新切片。`pipeline._run/search/rank_ids` 加 `gate: bool = True`，仅 `chat.py` 对续轮传 `gate=False`。**评测路径走默认 `gate=True`，F1 的冻结数字结构性不受影响。**真·空切片仍会拒答（`没有找到符合的歌`）。
+
+**修复后实测**（同一条会话，经 Koa）：
+
+```
+有首歌歌词是 I search for the strength -> new      5 首  A Road in the Country, Lighthouse Keeper, …
+换一首                                 -> more     5 首  Scattered, On The Edge, …（与首轮 0 重合）
+更欢快一点                              -> refine   5 首  Scattered, Boogie feat. Tracie Frank, …
+不要伤感                               -> negative  5 首  同上
+Coldplay 的 Yellow                    -> new      0 首  「曲库里没有 Coldplay 的《Yellow》…」（拒答仍正常）
+```
+
+回归用例：`test_regression.py::test_f7_continuation_turn_not_refused`。
 
 ## 3. 局限（含实现细节）
 

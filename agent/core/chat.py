@@ -100,7 +100,8 @@ def chat(session_id: str, query: str, user_id: int | None = None) -> dict:
         intent_override = parse(query)
 
     result = pipeline.search(query, user_id=user_id, exclude=exclude,
-                             extra_soft=extra_soft, intent_override=intent_override)
+                             extra_soft=extra_soft, intent_override=intent_override,
+                             gate=(action == "new"))   # continuations: see verify.CONTINUATION_MIN
     result["action"] = action
     result["session_id"] = session_id
 
