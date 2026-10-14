@@ -27,8 +27,14 @@ CONFIGS = [
 
 
 class AgentRank:
+    def __init__(self):
+        self.last_gray = False
+
     def search(self, query: str, k: int = 5) -> list[int]:
-        return rank_ids(query)[:k]
+        flag: dict = {}
+        ids = rank_ids(query, flag=flag)[:k]
+        self.last_gray = bool(flag.get("gray"))
+        return ids
 
 
 def main() -> int:

@@ -44,12 +44,12 @@ def _run(query: str, exclude=None, extra_soft=None, intent_override=None):
     if verify.named_not_found(intent, routes):
         who = intent.title or intent.artist
         return intent, [], matches, relaxed, trace, \
-            (f"曲库里没有《{who}》这首歌" if intent.title else f"曲库里没有 {who} 的歌") + "，要不要试试按风格或氛围描述来找？"
+            (f"曲库里没有《{who}》这首歌" if intent.title else f"曲库里没有 {who} 的歌") + "，要不要试试按风格或氛围描述来找？", False
 
     if not ablate.on("no_artist"):
         mm = verify.artist_mismatch(intent, routes)
         if mm:
-            return intent, [], matches, relaxed, trace, mm
+            return intent, [], matches, relaxed, trace, mm, False
 
     ranked = rank_mod.rank(intent, routes, matches, exclude=exclude, lyric_conf=lyric_conf)  # ③
     trace.append({"step": "rank", "n": len(ranked), "top": ranked[0] if ranked else None})
@@ -72,31 +72,41 @@ def _run(query: str, exclude=None, extra_soft=None, intent_override=None):
         trace.append({"step": "relax", "applied": desc, "n": len(ranked)})
 
     if not ranked:
-        return cur, [], matches, relaxed, trace, "没有找到符合的歌，换个说法或放宽条件试试？"
+        return cur, [], matches, relaxed, trace, "没有找到符合的歌，换个说法或放宽条件试试？", False
     if ranked[0][1] < thr:
-        return cur, [], matches, relaxed, trace, "不太确定你想找的是哪首，能再具体描述一下吗？"
-    return cur, ranked, matches, relaxed, trace, None
+        if verify.GRAY_ENABLED and is_lyric and ranked[0][1] >= verify.GRAY_LOW:
+            # F1 gray zone: don't hard-refuse, but don't claim "found" either —
+            # return up to 2 closest songs with a "不太确定" message.
+            trace.append({"step": "gray", "conf": round(ranked[0][1], 3)})
+            return cur, ranked[:2], matches, relaxed, trace, None, True
+        return cur, [], matches, relaxed, trace, "不太确定你想找的是哪首，能再具体描述一下吗？", False
+    return cur, ranked, matches, relaxed, trace, None, False
 
 
-def rank_ids(query: str, exclude=None, extra_soft=None, intent_override=None) -> list[int]:
-    """Ranked song ids only (no reason generation) — for eval/ablation."""
-    intent, ranked, _m, _r, _t, refuse = _run(query, exclude, extra_soft, intent_override)
+def rank_ids(query: str, exclude=None, extra_soft=None, intent_override=None, flag: dict | None = None) -> list[int]:
+    """Ranked song ids only (no reason generation) — for eval/ablation.
+    `flag` (optional) receives {"gray": bool} so the eval can count gray separately."""
+    intent, ranked, _m, _r, _t, refuse, gray = _run(query, exclude, extra_soft, intent_override)
+    if flag is not None:
+        flag["gray"] = gray
     return [] if refuse else [s for s, _ in ranked][: intent.count]
 
 
 def search(query: str, user_id: int | None = None, exclude=None,
            extra_soft=None, intent_override=None) -> dict:
-    intent, ranked, matches, relaxed, trace, refuse = _run(query, exclude, extra_soft, intent_override)
+    intent, ranked, matches, relaxed, trace, refuse, gray = _run(query, exclude, extra_soft, intent_override)
     if refuse:
         return _result([], refuse, relaxed, trace)
     songs, message, reason_error = respond_mod.build(intent, ranked, matches, user_id=user_id)  # ⑤
     trace.append({"step": "respond", "n": len(songs), "reason_error": reason_error})
-    if intent.style_of:
+    if gray:
+        message = "不太确定曲库里有没有这句，下面是最接近的：" + message
+    elif intent.style_of:
         message = f"曲库没有 {intent.style_of}，下面是风格接近的：" + message
     if relaxed:
         message = f"（放宽了：{'、'.join(relaxed)}）" + message
-    return _result(songs, message, relaxed, trace)
+    return _result(songs, message, relaxed, trace, gray=gray)
 
 
-def _result(songs, message, relaxed, trace):
-    return {"songs": songs, "message": message, "relaxed": relaxed, "trace": trace}
+def _result(songs, message, relaxed, trace, gray: bool = False):
+    return {"songs": songs, "message": message, "relaxed": relaxed, "trace": trace, "gray": gray}

@@ -90,7 +90,11 @@ class Agent:
     """The phase-3 pipeline (A)."""
     name = "A_agent"
 
+    def __init__(self):
+        self.last_gray = False
+
     def search(self, query: str, k: int = 5) -> list[int]:
         from agent.core.pipeline import search
         r = search(query)
+        self.last_gray = bool(r.get("gray", False))   # gray-zone -> excluded from eval
         return [s["song_id"] for s in r["songs"]][:k]

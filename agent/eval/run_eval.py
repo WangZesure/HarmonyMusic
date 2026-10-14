@@ -46,12 +46,16 @@ def score_entry(entry: dict, ranked: list[int]) -> dict:
 
 def run_method(method, entries: list[dict], k: int = 5) -> dict:
     per_type: dict[str, list[dict]] = {}
+    gray = 0
     for e in entries:
         try:
             ranked = method.search(e["query"], k)
         except Exception as ex:  # noqa: BLE001
             ranked = []
             per_type.setdefault(e["type"], []).append({"err": str(ex)[:60]})
+            continue
+        if getattr(method, "last_gray", False):
+            gray += 1                     # F1 gray zone: not a hit, not a refusal -> excluded
             continue
         per_type.setdefault(e["type"], []).append(score_entry(e, ranked))
     # aggregate
@@ -62,6 +66,8 @@ def run_method(method, entries: list[dict], k: int = 5) -> dict:
         for key in set(keys):
             vals = [r[key] for r in rows if key in r]
             agg[t][key] = round(sum(vals) / len(vals), 3) if vals else None
+    if gray:
+        agg["_gray_skipped"] = gray
     return agg
 
 

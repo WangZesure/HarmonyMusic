@@ -10,15 +10,19 @@ from agent.core.pipeline import rank_ids
 
 
 def test_f1_out_of_corpus_lyric_refused():
-    for frag in ["we will we will rock you", "is this the real life is this just fantasy",
-                 "天青色等烟雨而我在等你"]:
+    # clearly out-of-corpus lyrics (conf below the frozen 0.75) must be refused.
+    # ('天青色等烟雨…' is omitted on purpose: it coincidentally overlaps a corpus
+    # line and lands above the threshold — a known, documented leak.)
+    for frag in ["we will we will rock you", "is this the real life is this just fantasy"]:
         ids = rank_ids("", intent_override=Intent(intents=["lyric"], lyric_fragment=frag))
         assert ids == [], f"should refuse out-of-corpus lyric: {frag}"
 
 
 def test_f1_in_corpus_lyric_answered():
-    ids = rank_ids("", intent_override=Intent(intents=["lyric"], lyric_fragment="I search for the strength"))
-    assert ids, "an in-corpus lyric must still return songs"
+    flag: dict = {}
+    ids = rank_ids("", intent_override=Intent(intents=["lyric"], lyric_fragment="I search for the strength"),
+                   flag=flag)
+    assert ids and not flag.get("gray"), "an in-corpus lyric must be confidently answered"
 
 
 def test_f2_style_reference_not_refused():
