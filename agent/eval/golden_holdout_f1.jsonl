@@ -1,0 +1,40 @@
+{"id": "ho-ly00", "type": "lyric", "query": "想想死胡同", "gold_ids": [2027593], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly01", "type": "lyric", "query": "什么喜悦去侍奉，什么敬畏去看见", "gold_ids": [2266451], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly02", "type": "lyric", "query": "And they are so unhealthy for the brain.", "gold_ids": [1893042], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly03", "type": "lyric", "query": "淹没在谎言中的无重王座 歌词", "gold_ids": [2282861], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly04", "type": "lyric", "query": "那个陌生人的眼睛正在望着我", "gold_ids": [2264038], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly05", "type": "lyric", "query": "Grav Grav Gravity 我们正在失去 Grav Grav Gravity 这句歌词是什么歌", "gold_ids": [2307588], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly06", "type": "lyric", "query": "有人给我我想要的夜晚（就给我那些夜晚吧男孩）我一直在等和你一起的夏日夜晚", "gold_ids": [1858689], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly07", "type": "lyric", "query": "When I died they washed me out of the turret with a hose 歌词", "gold_ids": [1932812], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly08", "type": "lyric", "query": "把我的心脏勾住让鸽子吞掉 歌词", "gold_ids": [2021520], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly09", "type": "lyric", "query": "有句歌词是 But I heard a whisper, said child don't hide 的歌", "gold_ids": [2274039], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly10", "type": "lyric", "query": "But the cat ran… so I am running.", "gold_ids": [2251031], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly11", "type": "lyric", "query": "因为我知道我无法治愈破碎的梦想", "gold_ids": [2248144], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly12", "type": "lyric", "query": "你怎么让你做的每件事都看起来那么漂亮？", "gold_ids": [2314325], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly13", "type": "lyric", "query": "你在哪里，那个我把这条消息寄给的人？", "gold_ids": [2242600], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly14", "type": "lyric", "query": "But she love my Memphis pimpin'", "gold_ids": [2343127], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly15", "type": "lyric", "query": "你有意志的力量 歌词", "gold_ids": [2143353], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly16", "type": "lyric", "query": "有句歌词是 The road I walk passes through mountains so high 的歌叫什么", "gold_ids": [2295517], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly17", "type": "lyric", "query": "抬起头但内心仍在挣扎 歌词", "gold_ids": [1883456], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly18", "type": "lyric", "query": "有一句歌词是 My mind is filled with bad decisions 的歌叫什么", "gold_ids": [2296700], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ly19", "type": "lyric", "query": "有一句歌词是 What made Jack Daniels famous made a loser out of me 的歌叫什么", "gold_ids": [2302087], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm00", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Sweet Child O' Mine", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm01", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Rolling in the Deep", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm02", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Blowin' in the Wind", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm03", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Like a Rolling Stone", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm04", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Smells Like Teen Spirit", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm05", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Wonderwall", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm06", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 Take Me Home, Country Roads", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm07", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 月亮代表我的心", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm08", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 光年之外", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-fm09", "type": "absent", "kind": "lyric_famous", "query": "有句歌词是 平凡之路", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob00", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Tu vas bosser comme un chien", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob01", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Que passent les rêves, la mesquinerie ne fait pas de trêve…", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob02", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Let my lips taste your smile", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob03", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Baby, hold your ring tight.", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob04", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 And You put your hand to me.", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob05", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Can't you wake up with smile and health?", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob06", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Forced to do your will I must decide", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob07", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Hey ho larguez les amarres", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob08", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 It's getting harder with time", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}
+{"id": "ho-ob09", "type": "absent", "kind": "lyric_obscure", "query": "有一句歌词 Même si j’ai mal c’est l’grand carnaval", "gold_ids": [], "graded": null, "constraints": null, "split": "holdout"}

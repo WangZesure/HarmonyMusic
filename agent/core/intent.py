@@ -22,12 +22,20 @@ def _vocab() -> Vocab:
         return yaml.safe_load(f)
 
 
+class LyricSource(BaseModel):
+    """The song a lyric fragment is a KNOWN quote of (Melo-style 曲库反查)."""
+    title: str | None = None
+    artist: str | None = None
+    confidence: str = "low"        # only "high" is acted on
+
+
 class Intent(BaseModel):
     intents: list[str] = Field(default_factory=list)   # title/artist/lyric/describe/similar
     title: str | None = None
     artist: str | None = None
     lyric_fragment: str | None = None
     lyric_fragments_en: list[str] = Field(default_factory=list)  # 2-3 English paraphrases
+    lyric_source: LyricSource | None = None            # F1: recognised origin of the lyric
     filters: Filter = Field(default_factory=Filter)
     soft_tags: list[str] = Field(default_factory=list)
     semantic_query: str | None = None
@@ -68,6 +76,7 @@ intents: 从 ["title","artist","lyric","describe","similar"] 里选（可多个�
 title/artist: 用户明确点名的歌名/歌手（没有则 null）；
 lyric_fragment: 用户引用的歌词原文（没有则 null）。**第一人称、像歌词的句子（如“我感觉自己老了，时间一去不返”）也要当歌词，放进这里**；
 lyric_fragments_en: 若歌词片段是中文，给出 2-3 种英文转述关键词（用于匹配英文歌词）；否则给空数组；
+lyric_source: 若 lyric_fragment 是**你确定认得的某首知名歌曲的原句**，输出 {"title":歌名,"artist":歌手,"confidence":"high"}（歌名歌手要写对）；**中文转述外语歌词不算原句**、**拿不准一律 null**；
 semantic_query: 把需求改写成一句"歌曲卡片"风格的描述（歌名/歌手/风格/情绪/场景/主题），用于向量检索；
 filters: 硬约束，仅在用户**明说**时填 {"genres":[],"moods":[],"scenes":[],"vocal":null|"vocal"|"instrumental","languages":[],"duration_s":null|{"min":,"max":}}。**languages 必须用 ISO 639-1 两字母代码**（法语→fr，德语→de，英文→en）；
 soft_tags: 你**推测**的标签（只加分，不放 filters）；
@@ -149,6 +158,14 @@ def parse(query: str, llm=None) -> Intent:
         lf_en = [data["lyric_fragment_en"]]
     lf_en = [str(x)[:80] for x in lf_en if isinstance(x, (str, int))][:3]
     title, artist = data.get("title"), data.get("artist")
+    # F1: recognised origin of a quoted lyric (Melo-style library re-check)
+    ls = data.get("lyric_source")
+    lyric_source = None
+    if isinstance(ls, dict) and ls.get("title"):
+        lyric_source = LyricSource(
+            title=str(ls.get("title"))[:80],
+            artist=(str(ls["artist"])[:80] if ls.get("artist") else None),
+            confidence=str(ls.get("confidence") or "low").lower())
     # F2: "X 风格 / 像 X 那样的歌" is a STYLE reference — don't treat X as a name to find.
     style_of = None
     if (title or artist) and re.search(r"风格|那样的|那样的歌|那种味儿|那味儿|像.{1,12}一样", query):
@@ -159,6 +176,7 @@ def parse(query: str, llm=None) -> Intent:
                  ("title", "artist", "lyric", "describe", "similar")],
         title=title, artist=artist,
         lyric_fragment=data.get("lyric_fragment"), lyric_fragments_en=lf_en,
+        lyric_source=lyric_source,
         filters=filt, soft_tags=soft, semantic_query=data.get("semantic_query") or query,
         count=max(1, min(int(data.get("count") or 5), cfg.MAX_LIMIT)),
         style_of=style_of,

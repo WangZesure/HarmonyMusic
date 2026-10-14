@@ -21,11 +21,20 @@ def dcg(gains: list[int]) -> float:
 def score_entry(entry: dict, ranked: list[int]) -> dict:
     t = entry["type"]
     gold = entry.get("gold_ids") or []
-    if t in ("title", "lyric", "describe", "describe_fuzzy"):
-        hit1 = bool(gold and ranked[:1] and ranked[0] in gold)
-        hit5 = bool(gold and any(g in ranked[:5] for g in gold))
+    answered = len(ranked) > 0
+    # fixed-denominator buckets: confident answer vs refusal (hedged/gray only if enabled)
+    base = {"confident": int(answered), "refused": int(not answered)}
+    if t == "absent":
+        return base
+    if t == "lyric":
+        hit5 = int(bool(gold and any(g in ranked[:5] for g in gold)))
         mrr = next((1 / (i + 1) for i, x in enumerate(ranked[:5]) if x in gold), 0.0)
-        return {"hit1": int(hit1), "hit5": int(hit5), "mrr": mrr}
+        return {**base, "hit5": hit5, "mrr": mrr}
+    if t in ("title", "describe", "describe_fuzzy"):
+        hit1 = int(bool(gold and ranked[:1] and ranked[0] in gold))
+        hit5 = int(bool(gold and any(g in ranked[:5] for g in gold)))
+        mrr = next((1 / (i + 1) for i, x in enumerate(ranked[:5]) if x in gold), 0.0)
+        return {"hit1": hit1, "hit5": hit5, "mrr": mrr}
     if t == "mood":
         graded = {int(k): v for k, v in (entry.get("graded") or {}).items()}
         gains = [graded.get(x, 0) for x in ranked[:5]]
@@ -39,8 +48,6 @@ def score_entry(entry: dict, ranked: list[int]) -> dict:
         allowed = set(db.filter_songs(Filter(**f), 500, []))
         sat = [x in allowed for x in ranked[:5]]
         return {"satisfaction5": (sum(sat) / len(sat)) if sat else 1.0}
-    if t == "absent":
-        return {"refused": int(len(ranked) == 0)}
     return {}
 
 
@@ -57,7 +64,8 @@ def run_method(method, entries: list[dict], k: int = 5) -> dict:
         if getattr(method, "last_gray", False):
             gray += 1                     # F1 gray zone: not a hit, not a refusal -> excluded
             continue
-        per_type.setdefault(e["type"], []).append(score_entry(e, ranked))
+        key = e["type"] + ("/" + e["kind"] if e.get("kind") else "")   # absent reported by subclass
+        per_type.setdefault(key, []).append(score_entry(e, ranked))
     # aggregate
     agg = {}
     for t, rows in per_type.items():

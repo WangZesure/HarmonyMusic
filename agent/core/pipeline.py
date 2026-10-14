@@ -51,6 +51,22 @@ def _run(query: str, exclude=None, extra_soft=None, intent_override=None):
         if mm:
             return intent, [], matches, relaxed, trace, mm, False
 
+    # F1 (Melo-style 曲库反查): if the model recognised the lyric's origin, decide here
+    # BEFORE the lyric confidence threshold. Recognised famous lyrics are exactly the
+    # ones a single threshold can't separate.
+    src = intent.lyric_source
+    if verify.LYRIC_SOURCE_ENABLED and src is not None and src.confidence == "high" and src.title and is_lyric:
+        from agent.core.recall import fuzzy_title
+        sid = fuzzy_title(src.title, src.artist)
+        who = (f"{src.artist}《{src.title}》" if src.artist else f"《{src.title}》")
+        trace.append({"step": "lyric_source", "title": src.title, "artist": src.artist,
+                      "in_corpus": sid is not None})
+        if sid is None:
+            return intent, [], matches, relaxed, trace, f"这句出自 {who}，曲库里没有这首歌。", False
+        fill = [s for s in (routes.get("lyric") or routes.get("semantic") or []) if s != sid]
+        ranked = [(sid, 1.0)] + [(s, 0.9 - i * 0.01) for i, s in enumerate(fill[: max(0, intent.count - 1)])]
+        return intent, ranked, matches, relaxed, trace, None, False
+
     ranked = rank_mod.rank(intent, routes, matches, exclude=exclude, lyric_conf=lyric_conf)  # ③
     trace.append({"step": "rank", "n": len(ranked), "top": ranked[0] if ranked else None})
 

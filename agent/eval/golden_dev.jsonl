@@ -127,3 +127,33 @@
 {"id": "dev-lo17", "type": "absent", "query": "歌词 shake it off shake it off", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_out"}
 {"id": "dev-lo18", "type": "absent", "query": "有一句歌词 just a small town girl living in a lonely world", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_out"}
 {"id": "dev-lo19", "type": "absent", "query": "歌词 I am gonna be the man who wakes up next to you", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_out"}
+{"id": "dev-ob00", "type": "absent", "query": "有一句歌词 You hide, you fear, you feel ashamed", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob01", "type": "absent", "query": "有一句歌词 J’aime les secousses, mais les bosses me donnent la nausée,", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob02", "type": "absent", "query": "有一句歌词 Theres no point in looking back", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob03", "type": "absent", "query": "有一句歌词 Souvent perdus dans un bled inconnu", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob04", "type": "absent", "query": "有一句歌词 Let the light shine", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob05", "type": "absent", "query": "有一句歌词 Que passe la haine ,", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob06", "type": "absent", "query": "有一句歌词 Enter the sound, some music to end your troubles", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob07", "type": "absent", "query": "有一句歌词 All of this time, please give me a chance", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob08", "type": "absent", "query": "有一句歌词 but some happy things are going out of style", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob09", "type": "absent", "query": "有一句歌词 Will you aim that thing to yourself?", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob10", "type": "absent", "query": "让我能跟那个永远板着脸的家伙说上话", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob11", "type": "absent", "query": "你让我感到圆满的那种方式", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob12", "type": "absent", "query": "让它渗入你的血管", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob13", "type": "absent", "query": "你争斗，你夺取，你撒谎，你争斗", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob14", "type": "absent", "query": "你是否曾走过这条轨道", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob15", "type": "absent", "query": "母体的孩子", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob16", "type": "absent", "query": "像所有那些呆坐在电视机前、无聊到要死的人一样", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob17", "type": "absent", "query": "独自一人被留在这，孤立无援", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob18", "type": "absent", "query": "坚守你的信念", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob19", "type": "absent", "query": "如果我们的氛围让你沉醉，那你便置身于我们共同奋斗的征程中。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob20", "type": "absent", "query": "歌词 把心跳调成静音，在人群里假装透明。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob21", "type": "absent", "query": "歌词 你留下的外套，还挂着去年的雨。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob22", "type": "absent", "query": "歌词 我们像两列夜车，擦肩时亮了一下灯。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob23", "type": "absent", "query": "歌词 把回忆折成纸船，放进下水道旅行。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob24", "type": "absent", "query": "歌词 你的名字是口香糖，嚼到没味也舍不得吐。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob25", "type": "absent", "query": "歌词 我在便利店里，买不到你爱的那种晚安。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob26", "type": "absent", "query": "歌词 月亮是天空的补丁，缝不住我漏风的梦。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob27", "type": "absent", "query": "歌词 把聊天记录删成空白，却删不掉输入法记得你。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob28", "type": "absent", "query": "歌词 你走后的沙发，凹下去一块沉默。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
+{"id": "dev-ob29", "type": "absent", "query": "歌词 如果风有地址，我想寄一封没有字的信。", "gold_ids": [], "graded": null, "constraints": null, "split": "dev", "kind": "lyric_obscure"}
