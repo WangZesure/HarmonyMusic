@@ -142,11 +142,9 @@ struct Index {
             } else if (item.index == 3) {
               Mine({
                 goTab: (i: number) => {
+                  // changeIndex 会触发 Tabs.onChange，那里已经会拉歌单；这里不要再调一次
                   this.tabsController.changeIndex(i)
                   this.currentIndex = i
-                  if (i === 1) {
-                    this.getMySongData()
-                  }
                 }
               })
             }

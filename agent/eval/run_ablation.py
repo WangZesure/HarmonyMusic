@@ -55,9 +55,14 @@ def main() -> int:
         agg = run_method(AgentRank(), entries, 5)
         results[name] = agg
         print(f"== {name} ==")
-        for t in ("title", "lyric", "describe", "describe_fuzzy", "absent", "constraint", "mood"):
-            if t in agg:
-                print(f"   {t:14} {agg[t]}")
+        # run_eval 现在按 type/kind 分桶（absent/lyric_out、absent/lyric_obscure …），
+        # 只认 "absent" 会把这些子类静默丢掉。先打已知类型，再补齐其余所有桶。
+        known = [t for t in ("title", "lyric", "describe", "describe_fuzzy", "absent",
+                             "constraint", "mood") if t in agg]
+        known += sorted(k for k in agg if k.startswith("absent/"))
+        rest = sorted(k for k in agg if k not in known)
+        for t in known + rest:
+            print(f"   {t:14} {agg[t]}")
     (EVAL / "ablation.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     print("wrote agent/eval/ablation.json")
     return 0

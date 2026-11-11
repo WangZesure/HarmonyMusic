@@ -6,7 +6,7 @@ import { EmitEventType } from '../model/paramModel'
 import router from '@ohos.router'
 import playService  from './PlayService'
 import { ConfigUtil } from '../common/ConfigUtil'
-import { addPlay } from '../common/Api'
+import { addPlay, updatePlay } from '../common/Api'
 /**
  * 播放工具类
  */
@@ -145,9 +145,30 @@ export class AvPlayerUtils{
   }
 
   // 记录一次播放（听歌记录）。失败不影响播放，静默忽略。
+  // 策略：开播时先建一条（play_duration=0），切歌 / 暂停时用 flushPlayRecord()
+  //       把真实听了几秒回填进去。这样既能让「听歌记录」立刻看到当前歌，又不会
+  //       给推荐系统留下一堆 0/0 的假负样本（完成率 0 会被当成「没听完」）。
+  static pendingSongId: number = -1
+
   static recordPlay(song: SongModel) {
     if (!song || !song.id) { return }
+    // 换歌前先把上一首的真实时长回填
+    AvPlayerUtils.flushPlayRecord()
+    // 同一首继续播（暂停后恢复）不重复建记录
+    if (song.id === AvPlayerUtils.pendingSongId) { return }
+    AvPlayerUtils.pendingSongId = song.id
     addPlay(song.id, 0, 0).catch(() => {})
+  }
+
+  // 把当前这首歌已经听了多久回填到记录里（可重复调用，幂等）
+  // 注意：AVPlayer 的 time / duration 单位是毫秒，而 user_plays 的
+  // play_duration / full_duration 定义是秒，这里必须换算，否则会大 1000 倍。
+  static flushPlayRecord() {
+    const sid = AvPlayerUtils.pendingSongId
+    if (sid <= 0) { return }
+    const played = Math.round((AvPlayerUtils.time || 0) / 1000)
+    const full = Math.round((AvPlayerUtils.duration || 0) / 1000)
+    updatePlay(sid, played, full).catch(() => {})
   }
   /**
    * 切换播放
@@ -183,6 +204,8 @@ export class AvPlayerUtils{
 
     AvPlayerUtils.player.pause()
     AvPlayerUtils.isPlay = false
+    // 暂停时把已播放时长写回听歌记录
+    AvPlayerUtils.flushPlayRecord()
     //更新页面
     const playState:PlayStateType = {
       pic:AvPlayerUtils.playList[AvPlayerUtils.playIndex].pic,

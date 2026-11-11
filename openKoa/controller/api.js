@@ -370,25 +370,57 @@ exports.getUserInfo= async (ctx, next) =>{
 exports.addPlay = async (ctx) => {
     const userId = ctx.user.id
     const { songId, playDuration = 0, fullDuration = 0 } = ctx.request.body || {}
-    if (!songId) {
+    const sid = Math.round(Number(songId))
+    if (!Number.isFinite(sid) || sid <= 0) {
         ctx.status = 400
-        ctx.body = { code: 400, message: 'songId 不能为空' }
+        ctx.body = { code: 400, message: 'songId 必须是正整数' }
         return
     }
     const toInt = (v) => {
         const n = Math.round(Number(v))
         return Number.isFinite(n) && n > 0 ? n : 0
     }
-    await UserPlay.create({
+    const row = await UserPlay.create({
         user_id: userId,
-        song_id: toInt(songId),
+        song_id: sid,
         play_duration: toInt(playDuration),
         full_duration: toInt(fullDuration),
         play_time: new Date(),
         device_type: 'mobile',
         source: 'real',
     })
-    ctx.body = { code: 200, message: '记录成功', data: null }
+    // 返回 id：客户端在切歌/暂停时用它回填真实播放时长
+    ctx.body = { code: 200, message: '记录成功', data: { id: row.id } }
+}
+
+// 20.1 回填一次播放的真实时长（切歌/暂停时调用）
+// 按 (user_id, song_id) 找最近一条记录更新，客户端不需要持有行 id
+exports.updatePlay = async (ctx) => {
+    const userId = ctx.user.id
+    const { songId, playDuration = 0, fullDuration = 0 } = ctx.request.body || {}
+    const sid = Math.round(Number(songId))
+    if (!Number.isFinite(sid) || sid <= 0) {
+        ctx.status = 400
+        ctx.body = { code: 400, message: 'songId 必须是正整数' }
+        return
+    }
+    const toInt = (v) => {
+        const n = Math.round(Number(v))
+        return Number.isFinite(n) && n > 0 ? n : 0
+    }
+    const row = await UserPlay.findOne({
+        where: { user_id: userId, song_id: sid },
+        order: [['play_time', 'DESC']],
+    })
+    if (!row) {
+        ctx.body = { code: 200, message: '没有可更新的记录', data: null }
+        return
+    }
+    await row.update({
+        play_duration: toInt(playDuration),
+        full_duration: toInt(fullDuration),
+    })
+    ctx.body = { code: 200, message: '更新成功', data: { id: row.id } }
 }
 
 // 21 听歌记录：最近听过的歌（同一首只保留最近一次）
@@ -411,7 +443,12 @@ exports.getPlayHistory = async (ctx) => {
     }
     const ids = picked.map(r => r.song_id)
     const songs = ids.length
-        ? await Song.findAll({ where: { id: ids }, include: [{ model: Singer }] })
+        ? await Song.findAll({
+            where: { id: ids },
+            // 列表页只要展示字段：lyric 是整段歌词 TEXT，200 首会白白多传几十 KB
+            attributes: { exclude: ['lyric', 'introduction'] },
+            include: [{ model: Singer, attributes: ['id', 'name', 'pic'] }],
+        })
         : []
     const byId = new Map(songs.map(s => [s.id, s]))
     const data = picked
@@ -421,6 +458,7 @@ exports.getPlayHistory = async (ctx) => {
             return Object.assign({}, s.toJSON(), {
                 playTime: r.play_time,
                 playDuration: r.play_duration,
+                fullDuration: r.full_duration,
             })
         })
         .filter(Boolean)

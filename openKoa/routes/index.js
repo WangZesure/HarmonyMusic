@@ -90,6 +90,7 @@ router.post('/agent/chat', verifyToken(), controller.agentChat)
 
 // 20 听歌记录
 router.post('/addPlay', verifyToken(), controller.addPlay)
+router.post('/updatePlay', verifyToken(), controller.updatePlay)
 router.get('/getPlayHistory', verifyToken(), controller.getPlayHistory)
 
 module.exports = router

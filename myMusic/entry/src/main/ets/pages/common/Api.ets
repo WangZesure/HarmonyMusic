@@ -75,3 +75,16 @@ export const addPlay = (songId: number, playDuration: number, fullDuration: numb
 
 // 20 听歌记录（最近听过的歌，同一首只保留最近一次）
 export const getPlayHistory = (limit: number = 50) => HttpGet(`/getPlayHistory?limit=${limit}`);
+
+// 21 回填一次播放的真实时长（切歌 / 暂停时调用）
+// 服务端按 (user_id, song_id) 找最近一条记录更新，客户端不需要持有行 id
+interface UpdatePlayParam {
+  songId: number
+  playDuration: number
+  fullDuration: number
+}
+
+export const updatePlay = (songId: number, playDuration: number, fullDuration: number) => {
+  const param: UpdatePlayParam = { songId, playDuration, fullDuration }
+  return HttpPost(`/updatePlay`, param)
+}
