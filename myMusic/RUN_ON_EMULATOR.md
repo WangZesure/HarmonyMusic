@@ -65,8 +65,13 @@ DevEco 的签名密码是**本机 material 加密串**（`decipher-util` 读 `~/
 cd openKoa && node bin/www                                  # :3000
 D:\apps\tools\Conda\python.exe -m uvicorn agent.app:app --port 8000   # :8000
 
-# 构建 / 签名 / 安装 / 启动（一键）
-bash C:/Users/Lenovo/.ohos/config/mymusic_debug/build_sign_install.sh --install
+# 构建 / 签名 / 安装 / 启动（一键，脚本随仓库走）
+bash myMusic/scripts/sign_and_install_emulator.sh --install
+
+# 可用环境变量覆盖默认值：
+#   DEVECO_HOME  DevEco Studio 安装目录（默认 D:/apps/tools/arkstudio/DevEco Studio）
+#   SIGN_WORK    签名材料目录（默认 ~/.ohos/config/mymusic_debug）
+#   PYTHON       生成 profile 用的解释器
 
 # 关键：App 里写的是 localhost:3000，模拟器里的 localhost 不是宿主机，
 # 用反向端口转发打通（fport 是 host→device，方向反了，要用 rport）
