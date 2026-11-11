@@ -16,6 +16,9 @@ interface ListItem {
 export struct Mine {
   @StorageLink("isLogin") isLogin: boolean = false
   @StorageLink("userInfo") userInfo: UserModel = {}
+  // 由 Index 注入：切换到指定 tab（Mine 是 Index 的子组件，不能自己改父组件的 currentIndex）
+  goTab: (index: number) => void = () => {
+  }
   @State
   playState:PlayStateType = new PlayStateModel({"pic":"/img/songPic/tubiao.jpg","name":"音乐网","url":"","playIndex":0,"time":0,"duration":0,"isPlay":false,"playMode":"auto","playList":[]} as PlayStateType)
   //退出登录
@@ -59,12 +62,10 @@ export struct Mine {
             }
             // 跳转至对应页面
             if (item.route === 'pages/Index') {
-              router.pushUrl({
-                url: item.route,
-                params: {
-                  tabIndex: 1
-                }
-              });
+              // 「我的歌单」是 Index 里的 tab，不是独立页面。
+              // 原实现 pushUrl('pages/Index', {tabIndex:1}) 会压入一个新的 Index 实例，
+              // 而 Index 从不读取 tabIndex，所以看起来像「跳回首页」。
+              this.goTab(1)
             } else {
               router.pushUrl({ url: item.route })
             }

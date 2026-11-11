@@ -23,6 +23,8 @@ struct Index {
   @StorageLink("isLogin") isLogin: boolean = false
   @StorageLink("userInfo") userInfo: UserModel = {}
   @State currentIndex: number = 0
+  // Tabs 的 index 参数不是双向绑定，跨组件切 tab 必须走 controller
+  private tabsController: TabsController = new TabsController()
   @State mySongList: MySongModel = new MySongModel({ username: '', avatar: '' }, [])
   @State isCollectList: boolean[] = []
   @State momentList: SongCommentModel[] = []
@@ -117,7 +119,7 @@ struct Index {
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
-      Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
+      Tabs({ barPosition: BarPosition.End, index: this.currentIndex, controller: this.tabsController }) {
         ForEach(tabsData, (item: TabBarModel) => {
           TabContent() {
             if (item.index == 0) {
@@ -138,7 +140,15 @@ struct Index {
                 }
               })
             } else if (item.index == 3) {
-              Mine()
+              Mine({
+                goTab: (i: number) => {
+                  this.tabsController.changeIndex(i)
+                  this.currentIndex = i
+                  if (i === 1) {
+                    this.getMySongData()
+                  }
+                }
+              })
             }
 
           }
