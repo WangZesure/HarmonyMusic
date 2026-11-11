@@ -78,3 +78,6 @@ ehthumbs.db
 # DevEco SDK wizard artifacts accidentally created in the repo root
 /26.0.0/
 /licenses/
+
+# Recommender checkpoint (rebuild with `python -m recsys.train`)
+recommend/artifacts/*.pt

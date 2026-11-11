@@ -5,6 +5,7 @@ import router from '@ohos.router';
 import { PlayStateModel } from '../model/PlayStateModel'
 import emitter from '@ohos.events.emitter'
 import { EmitEventType } from '../model/paramModel'
+import { AvPlayerUtils } from '../utils/AvPlayerUtils'
 
 @Component
 export struct Home{
@@ -12,7 +13,19 @@ export struct Home{
   @State songList:SongListModel[] = []
   @State recommendSongs:RecommendSongModel[] = [] // 新增：AI推荐单曲
   @State singerList:SingerModel[] = []
-  @StorageLink("userInfo") userInfo: Record<string, ESObject> = {}  // 获取用户信息用于个性化推荐
+  // 用户信息是异步从 Preferences 读回来的（Index.initUser），Home 的 aboutToAppear
+  // 往往先跑，此时 userInfo 还是空的，会退回 userId=3。这里监听变化后重新拉推荐。
+  @StorageLink("userInfo") @Watch("onUserInfoChanged") userInfo: Record<string, ESObject> = {}
+  @State lastUserId: number = -1
+
+  onUserInfoChanged() {
+    const uid = (this.userInfo?.id as number) || 3
+    if (uid === this.lastUserId) {
+      return
+    }
+    this.lastUserId = uid
+    this.recommendSongListData()
+  }
   // 获取轮播图接口
   async getSwiperData(){  /// async...await
     const res = await getSwiperList()
@@ -23,8 +36,17 @@ export struct Home{
   async recommendSongListData(){
     try {
       // 优先使用AI推荐
-      const userId = (this.userInfo?.user?.id as number) || 3; // 默认用户ID为3
+      // Login.ets 存的是 data.user 本身（{id, username, ...}），不是 {user: {...}}。
+      // 之前写成 userInfo.user.id，多套了一层，登录用户永远落到默认值 3（该用户不存在
+      // 于 consumers，于是所有人看到的都是热门兜底）。
+      const userId = (this.userInfo?.id as number) || 3; // 未登录时用 3 -> 后端走热门兜底
+      this.lastUserId = userId
       const res = await getRecommendSongs(userId, 6);
+      // 用户信息异步到位：如果等待期间 userId 变了（3 -> 真实 id），这个响应已过期，
+      // 直接丢弃，否则较慢的旧响应会覆盖掉新结果。
+      if (userId !== this.lastUserId) {
+        return
+      }
       // 检查响应是否包含code属性（后端返回格式）或success属性（ResponseModel格式）
       const resRecord = res as Record<string, ESObject>;
       const isSuccess = resRecord.code === 200 || res.success;
@@ -227,25 +249,12 @@ export struct Home{
   
   // 播放推荐歌曲的方法
   playRecommendSong(song: RecommendSongModel) {
-    const playList = [song]; // 将推荐歌曲作为播放列表
-    const playState = new PlayStateModel({
-      pic: song.pic,
-      name: song.name,
-      url: song.url,
-      playIndex: 0,
-      time: 0,
-      duration: 0,
-      isPlay: true,
-      playMode: "auto",
-      playList: playList
-    });
-    
-    // 发送播放事件
-    emitter.emit({ eventId: EmitEventType.UPDATE_STATE }, {
-      data: { playStateStr: JSON.stringify(playState) }
-    });
-    
-    console.log('开始播放AI推荐歌曲:', song.name);
+    // 原实现只 emit 了一条 UI 状态事件，播放器从未启动：
+    // 界面上看着在播，实际没声音，也不会写进听歌记录。
+    // 走 playSingle 才会真正加载 /stream/{id} 并触发记录。
+    const songModel = new SongModel(song.id, song.name, song.pic || '', song.url || '')
+    AvPlayerUtils.playSingle(songModel)
+    console.log('开始播放AI推荐歌曲:', song.name)
   }
   @Builder
   getSingerWidget(){

@@ -11,6 +11,12 @@ const UserPlay = model.user_play
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 const md5 = require('md5')
+
+// 推荐结果缓存。推荐脚本每次调用都要 `import torch`（约 5s），而真正的推理只有 0.2s。
+// 短 TTL 缓存让首页只吃一次冷启动，而不是每次刷新都等 8 秒。
+// 设 REC_CACHE_MS=0 可关闭。
+const REC_CACHE = new Map()
+const REC_CACHE_MS = Number(process.env.REC_CACHE_MS || 10 * 60 * 1000)
 const {generateToken} = require( '../utils/token')
 
 // 1.获得轮播图
@@ -488,7 +494,9 @@ exports.agentChat = async (ctx) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-User-Id': String(ctx.user.id) },
             body: JSON.stringify({ session_id: sessionId, query: message }),
-            signal: AbortSignal.timeout(20000),          // 阶段5顺手做：转发加超时
+            // Agent 冷启动要加载 bge-m3 + 重排模型（约 45s），20s 会误判为不可用。
+            // 60s 覆盖冷启动，热态下仍然是秒级。
+            signal: AbortSignal.timeout(Number(process.env.AGENT_TIMEOUT_MS || 60000)),
         })
         const json = await resp.json()
         send('result', json.data || json)
@@ -501,6 +509,15 @@ exports.agentChat = async (ctx) => {
 // 获取AI推荐单曲（基于机器学习模型）
 exports.getRecommendSongs = async (ctx, next) => {
     const { userId = 3, count = 6 } = ctx.request.query;
+
+    const cacheKey = `${userId}:${count}`
+    if (REC_CACHE_MS > 0) {
+        const hit = REC_CACHE.get(cacheKey)
+        if (hit && Date.now() - hit.at < REC_CACHE_MS) {
+            ctx.body = hit.body
+            return
+        }
+    }
     
     try {
         const { exec } = require('child_process');
@@ -509,7 +526,10 @@ exports.getRecommendSongs = async (ctx, next) => {
         // 推荐系统脚本路径 - 修正路径
         const scriptPath = path.join(__dirname, '../../recommend/scripts/api/simple_recommend.py');
         const workingDir = path.join(__dirname, '../../recommend');
-        const command = `python "scripts/api/simple_recommend.py" ${userId} ${count}`;
+        // 推荐脚本需要 torch（内容双塔），系统 python 里通常没有。
+        // 用 RECOMMEND_PYTHON 指定带 torch 的解释器，缺省回退到 python。
+        const py = process.env.RECOMMEND_PYTHON || 'python';
+        const command = `"${py}" "scripts/api/simple_recommend.py" ${userId} ${count}`;
         
         console.log('执行推荐命令:', command);
         console.log('工作目录:', workingDir);
@@ -565,28 +585,39 @@ exports.getRecommendSongs = async (ctx, next) => {
             });
             
             // 按推荐分数排序并添加推荐分数
+            // 注意：热门兜底的 score 是 1.0/0.99/... 的排序分，不是匹配度，
+            // 直接写成「xx%匹配」会误导，所以按 algorithm 分开措辞。
+            const algo = result.algorithm || 'two-tower-v2';
             const sortedSongs = result.recommendations.map(rec => {
                 const song = songs.find(s => s.id === rec.song_id);
                 if (song) {
                     return {
                         ...song.toJSON(),
                         recommendScore: rec.score,
-                        reason: `AI推荐 (${(rec.score * 100).toFixed(1)}%匹配)`
+                        reason: algo === 'popularity'
+                            ? '热门推荐'
+                            : `AI推荐 (${(rec.score * 100).toFixed(1)}%匹配)`
                     };
                 }
                 return null;
             }).filter(song => song !== null);
             
-            ctx.body = {
-                code: 200, 
+            const body = {
+                code: 200,
                 message: 'AI推荐单曲成功',
                 data: sortedSongs,
                 meta: {
                     userId: userId,
                     count: sortedSongs.length,
-                    algorithm: 'twin_tower_neural_network'
+                    // 脚本自己报告用了哪条路径：two-tower-v2 / popularity
+                    algorithm: algo,
+                    reason: result.reason || ''
                 }
             };
+            if (REC_CACHE_MS > 0) {
+                REC_CACHE.set(cacheKey, { at: Date.now(), body })
+            }
+            ctx.body = body;
         } else {
             throw new Error('推荐系统返回无效结果');
         }
