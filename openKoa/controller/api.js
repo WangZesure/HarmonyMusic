@@ -176,19 +176,30 @@ exports.streamAudio = async (ctx) => {
 
 // 登录
 exports.login = async (ctx, next) =>{
-        const {username, password} = ctx.request.body
+        const {username, password} = ctx.request.body || {}
+        // 入参校验：缺字段时 md5(undefined) 会抛异常并穿透到 koa-static，
+        // 表现为 500 HTML 堆栈页。这里统一返回 JSON 4xx。
+        if (!username || !password) {
+            ctx.status = 400
+            ctx.body = {code: 400, message: '用户名和密码不能为空'}
+            return
+        }
         const user = await Consumer.findOne({
             where:{
                 username,
                 password:md5(password)
             },
-            //attributes:['username','avatar']  
+            //attributes:['username','avatar']
         })
         // 存token 返回给客户的
         if(user){
             // 登录成功
             const token = await generateToken({username:user.username,id:user.id})
             ctx.body = {code: 200, message:"登录成功",data:{user,token}}
+        } else {
+            // 凭证错误：原实现不写 body，请求穿透到 koa-static 变成 404 text/plain
+            ctx.status = 401
+            ctx.body = {code: 401, message: '用户名或密码错误'}
         }
 
 }

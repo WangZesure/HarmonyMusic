@@ -42,7 +42,7 @@ local.properties
 # Downloaded models / large resources (HF_HOME, bge-m3, reranker)
 # ------------------------------------------------------------------ #
 resources/
-
+temp/
 # ------------------------------------------------------------------ #
 # Data pipeline artifacts — large / regenerable (raw JSON, LRC, index,
 # LLM cache, agent logs). Curated deliverables live in DocsForMusicAgent/.
@@ -72,3 +72,7 @@ __MACOSX/
 .vscode/
 Thumbs.db
 ehthumbs.db
+
+# DevEco SDK wizard artifacts accidentally created in the repo root
+/26.0.0/
+/licenses/

@@ -21,10 +21,13 @@ exports.verifyToken = (required=true) => {
                 ctx.user = user;
                 await next();
             }catch(err){
+                // 用 401 而不是 200：否则客户端无法区分「鉴权失败」和「成功但空数据」
+                ctx.status = 401;
                 ctx.body = {code:801,message:'token过期'};
             }
         }else if(required){
              // 没token
+             ctx.status = 401;
              ctx.body = {code:802,message:'token不存在'};
         }
     }

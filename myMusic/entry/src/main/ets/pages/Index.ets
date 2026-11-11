@@ -56,6 +56,8 @@ struct Index {
 
   //获得我的歌单
   async getMySongData() {
+    // /getMySongList 需要鉴权：未登录时直接跳过，避免 401 弹出「请求失败请检查网络」
+    if (!this.isLogin) { return }
     const response = await geMySongList()
     if (response.success) {
       let data = JSON.stringify(response.data)
