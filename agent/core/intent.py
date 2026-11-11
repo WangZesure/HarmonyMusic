@@ -76,8 +76,7 @@ intents: 从 ["title","artist","lyric","describe","similar"] 里选（可多个�
 title/artist: 用户明确点名的歌名/歌手（没有则 null）；
 lyric_fragment: 用户引用的歌词原文（没有则 null）。**第一人称、像歌词的句子（如“我感觉自己老了，时间一去不返”）也要当歌词，放进这里**；
 lyric_fragments_en: 若歌词片段是中文，给出 2-3 种英文转述关键词（用于匹配英文歌词）；否则给空数组；
-lyric_source: 若 lyric_fragment 是**你确定认得的某首知名歌曲的原句**，输出 {"title":歌名,"artist":歌手,"confidence":"high"}（歌名歌手要写对）；**中文转述外语歌词不算原句**、**拿不准一律 null**；
-semantic_query: 把需求改写成一句"歌曲卡片"风格的描述（歌名/歌手/风格/情绪/场景/主题），用于向量检索；
+{lyric_source_field}semantic_query: 把需求改写成一句"歌曲卡片"风格的描述（歌名/歌手/风格/情绪/场景/主题），用于向量检索；
 filters: 硬约束，仅在用户**明说**时填 {"genres":[],"moods":[],"scenes":[],"vocal":null|"vocal"|"instrumental","languages":[],"duration_s":null|{"min":,"max":}}。**languages 必须用 ISO 639-1 两字母代码**（法语→fr，德语→de，英文→en）；
 soft_tags: 你**推测**的标签（只加分，不放 filters）；
 count: 需要几首（默认 5）。
@@ -85,10 +84,18 @@ count: 需要几首（默认 5）。
 """
 
 
+_LYRIC_SOURCE_FIELD = ('lyric_source: 若 lyric_fragment 是**你确定认得的某首知名歌曲的原句**，输出 '
+                       '{"title":歌名,"artist":歌手,"confidence":"high"}（歌名歌手要写对）；'
+                       '**中文转述外语歌词不算原句**、**拿不准一律 null**；\n')
+
+
 def build_system() -> str:
+    from agent.core import verify
     v = _vocab()
     aliases = "\n".join(f"{k} -> {t}" for k, t in v.get("aliases", {}).items())
-    return (_SYSTEM
+    # The prompt itself changes every parse, so a disabled feature must not leave its field in it.
+    field = _LYRIC_SOURCE_FIELD if verify.LYRIC_SOURCE_ENABLED else ""
+    return (_SYSTEM.replace("{lyric_source_field}", field)
             + f"\ngenres: {v['genre']}\nmoods: {v['mood']}\nscenes: {v['scene']}"
             + f"\n口语别名映射:\n{aliases}")
 
