@@ -88,4 +88,8 @@ router.post('/uploads',upload.single('file'),async (ctx,next)=>{
 // 19 AI 搜歌（多轮对话）SSE 流式；鉴权复用现有 JWT 中间件（阶段5）
 router.post('/agent/chat', verifyToken(), controller.agentChat)
 
+// 20 听歌记录
+router.post('/addPlay', verifyToken(), controller.addPlay)
+router.get('/getPlayHistory', verifyToken(), controller.getPlayHistory)
+
 module.exports = router

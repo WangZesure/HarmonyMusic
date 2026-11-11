@@ -37,7 +37,7 @@ export struct Mine {
   // 功能选项数据
   @State list: ListItem[] = [
     { icon: $r('app.media.ic_favorite'), name: '我的歌单', route: 'pages/Index' },
-    { icon: $r('app.media.ic_music'), name: '我的浏览记录', route: '' },
+    { icon: $r('app.media.ic_music'), name: '听歌记录', route: 'pages/PlayHistory' },
     { icon: $r('app.media.setting'), name: '设置', route: 'pages/UserEdit' }
   ];
 

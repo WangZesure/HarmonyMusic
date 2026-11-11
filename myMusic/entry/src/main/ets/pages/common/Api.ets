@@ -60,3 +60,18 @@ export const userEdit = (params:UserEditParam) => HttpPost(`/userEdit`,params);
 
 // 18 获取用户信息 getUserInfo
 export const getUserInfo = () => HttpGet(`/getUserInfo`);
+
+// 19 记录一次播放（听歌记录）
+interface AddPlayParam {
+  songId: number
+  playDuration: number
+  fullDuration: number
+}
+
+export const addPlay = (songId: number, playDuration: number, fullDuration: number) => {
+  const param: AddPlayParam = { songId, playDuration, fullDuration }
+  return HttpPost(`/addPlay`, param)
+}
+
+// 20 听歌记录（最近听过的歌，同一首只保留最近一次）
+export const getPlayHistory = (limit: number = 50) => HttpGet(`/getPlayHistory?limit=${limit}`);

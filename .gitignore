@@ -41,7 +41,9 @@ local.properties
 # ------------------------------------------------------------------ #
 # Downloaded models / large resources (HF_HOME, bge-m3, reranker)
 # ------------------------------------------------------------------ #
-resources/
+# 只忽略仓库根目录的 HF 模型缓存；写成 resources/ 会连
+# myMusic/entry/src/main/resources 一起忽略掉（客户端资源会被挡在版本库外）
+/resources/
 temp/
 # ------------------------------------------------------------------ #
 # Data pipeline artifacts — large / regenerable (raw JSON, LRC, index,

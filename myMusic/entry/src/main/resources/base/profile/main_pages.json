@@ -11,7 +11,8 @@
     "pages/SongsDetail",
     "pages/Play",
     "pages/UserEdit",
-    "pages/AiSearch"
+    "pages/AiSearch",
+    "pages/PlayHistory"
 
   ]
 }

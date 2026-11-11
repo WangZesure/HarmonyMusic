@@ -14,6 +14,7 @@ const song_list = require('./song_list.js')(sequelize,DataTypes);
 const song = require('./song.js')(sequelize,DataTypes);
 const swiper = require('./swiper.js')(sequelize,DataTypes);
 const list_song = require('./list_song.js')(sequelize,DataTypes);
+const user_play = require('./user_play.js')(sequelize,DataTypes);
 
 // singer 和 song 一对多关系 : 一个歌手有多个歌曲，一个歌曲属于一个歌手
 singer.hasMany(song, { foreignKey: 'singer_id' });
@@ -40,6 +41,13 @@ comment.belongsTo(song,{ foreignKey: 'song_id' });
 comment.belongsTo(consumer, { foreignKey: 'user_id' });
 consumer.hasMany(comment, { foreignKey: 'user_id' });
 
+// 播放记录：一个用户有多条播放记录，一首歌也有多条
+song.hasMany(user_play, { foreignKey: 'song_id' });
+user_play.belongsTo(song, { foreignKey: 'song_id' });
+
+consumer.hasMany(user_play, { foreignKey: 'user_id' });
+user_play.belongsTo(consumer, { foreignKey: 'user_id' });
+
 // 5.模型同步   sequelize.sync() 自动同步所有模型
 sequelize.sync()
 // 6 . 导出模型
@@ -53,6 +61,7 @@ exports.song_list = song_list;
 exports.song = song;
 exports.swiper = swiper;
 exports.list_song = list_song;
+exports.user_play = user_play;
 exports.sequelize = sequelize;
 
 

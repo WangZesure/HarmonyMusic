@@ -7,6 +7,7 @@ const Singer = model.singer // 歌手表
 const Consumer = model.consumer
 const Collect = model.collect
 const Comment = model.comment
+const UserPlay = model.user_play
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 const md5 = require('md5')
@@ -363,6 +364,67 @@ exports.getUserInfo= async (ctx, next) =>{
     const userId = ctx.user.id
     let user = await Consumer.findOne({where:{id:userId}})
     ctx.body = {code: 200, message:"用户信息",data:{user}}
+}
+
+// 20 记录一次播放（听歌记录）
+exports.addPlay = async (ctx) => {
+    const userId = ctx.user.id
+    const { songId, playDuration = 0, fullDuration = 0 } = ctx.request.body || {}
+    if (!songId) {
+        ctx.status = 400
+        ctx.body = { code: 400, message: 'songId 不能为空' }
+        return
+    }
+    const toInt = (v) => {
+        const n = Math.round(Number(v))
+        return Number.isFinite(n) && n > 0 ? n : 0
+    }
+    await UserPlay.create({
+        user_id: userId,
+        song_id: toInt(songId),
+        play_duration: toInt(playDuration),
+        full_duration: toInt(fullDuration),
+        play_time: new Date(),
+        device_type: 'mobile',
+        source: 'real',
+    })
+    ctx.body = { code: 200, message: '记录成功', data: null }
+}
+
+// 21 听歌记录：最近听过的歌（同一首只保留最近一次）
+exports.getPlayHistory = async (ctx) => {
+    const userId = ctx.user.id
+    const limit = Math.min(Math.max(Number(ctx.query.limit) || 50, 1), 200)
+    const rows = await UserPlay.findAll({
+        where: { user_id: userId },
+        order: [['play_time', 'DESC']],
+        limit: 500,
+    })
+    // 去重：同一首歌只保留最近一次播放
+    const seen = new Set()
+    const picked = []
+    for (const r of rows) {
+        if (seen.has(r.song_id)) continue
+        seen.add(r.song_id)
+        picked.push(r)
+        if (picked.length >= limit) break
+    }
+    const ids = picked.map(r => r.song_id)
+    const songs = ids.length
+        ? await Song.findAll({ where: { id: ids }, include: [{ model: Singer }] })
+        : []
+    const byId = new Map(songs.map(s => [s.id, s]))
+    const data = picked
+        .map(r => {
+            const s = byId.get(r.song_id)
+            if (!s) return null
+            return Object.assign({}, s.toJSON(), {
+                playTime: r.play_time,
+                playDuration: r.play_duration,
+            })
+        })
+        .filter(Boolean)
+    ctx.body = { code: 200, message: '听歌记录', data }
 }
 
 // 19 AI 搜歌（多轮）—— 转发到 Python Agent 服务，用 SSE 流式返回过程（阶段5）

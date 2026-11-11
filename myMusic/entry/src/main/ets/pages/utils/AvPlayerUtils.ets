@@ -6,6 +6,7 @@ import { EmitEventType } from '../model/paramModel'
 import router from '@ohos.router'
 import playService  from './PlayService'
 import { ConfigUtil } from '../common/ConfigUtil'
+import { addPlay } from '../common/Api'
 /**
  * 播放工具类
  */
@@ -128,6 +129,7 @@ export class AvPlayerUtils{
       }else{
         // 切换歌曲(更新播放索引切换歌曲)
         AvPlayerUtils.playIndex = AvPlayerUtils.playList.findIndex((item:SongModel)=>item.id===song.id)
+        AvPlayerUtils.recordPlay(song)
         AvPlayerUtils.changePlay()
       }
     }else{
@@ -135,10 +137,17 @@ export class AvPlayerUtils{
       AvPlayerUtils.playList.unshift(song)
       console.log('song',song.url)
       AvPlayerUtils.playIndex = 0
+      AvPlayerUtils.recordPlay(song)
       AvPlayerUtils.changePlay() //重要切换播放
       console.log('+++playList',AvPlayerUtils.playList)
     }
 
+  }
+
+  // 记录一次播放（听歌记录）。失败不影响播放，静默忽略。
+  static recordPlay(song: SongModel) {
+    if (!song || !song.id) { return }
+    addPlay(song.id, 0, 0).catch(() => {})
   }
   /**
    * 切换播放
