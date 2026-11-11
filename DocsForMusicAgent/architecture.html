@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HarmonyMusic · 架构与 Agent 实现</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#e2e6ec; --ink:#151922; --mute:#5d6675;
+    --client:#2f6df6; --client-bg:#eef3ff;
+    --backend:#12a06a; --backend-bg:#eafaf3;
+    --agent:#7c4dff; --agent-bg:#f3eeff;
+    --data:#d98300; --data-bg:#fff6e6;
+    --hot:#e04a5f; --hot-bg:#fdeef0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:15px/1.6 "PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:36px}
+  h2{font-size:19px;margin:52px 0 18px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+  h2 .n{display:inline-block;background:var(--ink);color:#fff;border-radius:6px;
+        font-size:12px;padding:2px 8px;margin-right:10px;vertical-align:2px;font-weight:600}
+  h3{font-size:14px;margin:26px 0 10px;color:var(--mute);font-weight:600;letter-spacing:.04em}
+
+  /* ---------- 通用盒子 ---------- */
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .box .t{font-weight:650;font-size:15px}
+  .box .d{font-size:12.5px;color:var(--mute);margin-top:3px}
+  .layer{border-left:4px solid var(--line)}
+  .l-client{border-left-color:var(--client);background:var(--client-bg)}
+  .l-backend{border-left-color:var(--backend);background:var(--backend-bg)}
+  .l-agent{border-left-color:var(--agent);background:var(--agent-bg)}
+  .l-data{border-left-color:var(--data);background:var(--data-bg)}
+
+  /* ---------- 架构图 ---------- */
+  .arch{display:grid;gap:0}
+  .row{display:flex;justify-content:center;gap:16px}
+  .arrow-down{display:flex;flex-direction:column;align-items:center;color:#9aa4b2;
+              font-size:11px;margin:8px 0;line-height:1.2}
+  .arrow-down .ln{width:2px;height:22px;background:#c9d0da}
+  .arrow-down .hd{width:0;height:0;border-left:5px solid transparent;
+                  border-right:5px solid transparent;border-top:7px solid #c9d0da}
+  .arrow-down .lb{margin-top:4px;color:var(--mute);font-family:ui-monospace,Consolas,monospace;
+                  font-size:11px;background:var(--bg);padding:0 6px}
+
+  .split{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:8px}
+  .split .box{min-height:92px}
+
+  /* ---------- 流程卡片 ---------- */
+  .flows{display:grid;grid-template-columns:1fr;gap:14px;margin-top:6px}
+  .flow{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .flow .fh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .pill{font-size:11px;font-weight:650;padding:2px 9px;border-radius:20px;letter-spacing:.03em}
+  .p-blue{background:var(--client-bg);color:var(--client)}
+  .p-green{background:var(--backend-bg);color:var(--backend)}
+  .p-purple{background:var(--agent-bg);color:var(--agent)}
+  .p-hot{background:var(--hot-bg);color:var(--hot)}
+  .chain{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .node{background:#fbfcfe;border:1px solid var(--line);border-radius:8px;
+        padding:7px 11px;font-size:13px;white-space:nowrap}
+  .node b{font-weight:650}
+  .node .sm{display:block;font-size:11px;color:var(--mute);font-weight:400;margin-top:1px}
+  .sep{color:#b6bfcc;font-size:15px;font-weight:700}
+  .note{margin-top:11px;font-size:12.5px;color:var(--mute);padding-left:11px;
+        border-left:2px solid var(--line)}
+
+  /* ---------- Agent 流水线 ---------- */
+  .pipe{display:grid;gap:0}
+  .stage{display:grid;grid-template-columns:54px 1fr;gap:16px;align-items:stretch}
+  .rail{display:flex;flex-direction:column;align-items:center}
+  .dot{width:38px;height:38px;border-radius:50%;background:var(--agent);color:#fff;
+       display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
+       flex:0 0 auto;box-shadow:0 0 0 4px var(--agent-bg)}
+  .vline{width:2px;flex:1;background:#d9d2f0;min-height:16px}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:12px;
+         padding:14px 16px;margin-bottom:12px}
+  .scard .sh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .scard .sn{font-weight:700;font-size:15px}
+  .scard .file{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--mute);
+               background:#f2f4f7;padding:1px 7px;border-radius:5px}
+  .io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}
+  .io .k{font-size:11px;color:var(--mute);letter-spacing:.05em;margin-bottom:3px}
+  .io .v{font-size:13px}
+  .io code{font-family:ui-monospace,Consolas,monospace;font-size:12px;
+           background:#f2f4f7;padding:1px 5px;border-radius:4px}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:20px;
+       background:#f2f4f7;color:var(--mute);margin:2px 4px 0 0}
+
+  /* ---------- 分支图 ---------- */
+  .branch{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:6px}
+  .brow{display:flex;justify-content:center;margin:6px 0}
+  .bcols{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:10px}
+  .bcol{border:1px dashed var(--line);border-radius:10px;padding:14px}
+  .bcol.hot{border-color:#f0c3ca;background:var(--hot-bg)}
+  .bcol .bt{font-weight:650;font-size:14px;margin-bottom:8px}
+  .bcol .step{font-size:12.5px;color:var(--mute);margin:5px 0;padding-left:16px;position:relative}
+  .bcol .step:before{content:"›";position:absolute;left:4px;color:#b6bfcc;font-weight:700}
+
+  /* ---------- 表格 ---------- */
+  table{width:100%;border-collapse:collapse;background:var(--card);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+  th{background:#f2f4f7;text-align:left;padding:9px 12px;font-weight:650;font-size:12px;
+     color:var(--mute);letter-spacing:.03em}
+  td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+  td.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:14px 0 0}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);
+        font-size:12px;color:var(--mute)}
+  @media print{body{background:#fff}.wrap{padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>HarmonyMusic · 架构与 Agent 实现</h1>
+  <div class="sub">离线建库 → 在线检索：一个 App、一个后端、三条检索入口</div>
+
+  <!-- ============ 第一部分 ============ -->
+  <h2><span class="n">01</span>前后端整体架构</h2>
+
+  <div class="arch">
+
+    <div class="row">
+      <div class="box layer l-client" style="width:520px">
+        <div class="t">鸿蒙客户端 · myMusic/</div>
+        <div class="d">ArkTS / ArkUI · Index.ets 宿主 4 个 tab ＋ Play.ets ＋ AiSearch.ets</div>
+        <div style="margin-top:9px">
+          <span class="tag">HttpUtil 自动注入 JWT</span>
+          <span class="tag">AVPlayer</span>
+          <span class="tag">@StorageLink 登录态</span>
+          <span class="tag">emitter 播放状态</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down"><div class="ln"></div><div class="hd"></div>
+      <div class="lb">HTTP :3000 · JSON / SSE</div></div>
+
+    <div class="row">
+      <div class="box layer l-backend" style="width:520px">
+        <div class="t">Koa 后端 · openKoa/</div>
+        <div class="d">routes/index.js → controller/api.js → Sequelize</div>
+        <div style="margin-top:9px">
+          <span class="tag">JWT（md5 密码）</span>
+          <span class="tag">/stream/:id → 302</span>
+          <span class="tag">/agent/chat → SSE</span>
+          <span class="tag">koa-static public/</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down"><div class="ln"></div><div class="hd"></div>
+      <div class="lb">Sequelize · SQL</div></div>
+
+    <div class="split">
+      <div class="box layer l-data">
+        <div class="t">MySQL · mymusic</div>
+        <div class="d">14 张表<br>500 歌 / 328 歌手 / 11,148 歌词行</div>
+      </div>
+      <div class="box layer l-agent">
+        <div class="t">搜歌 Agent · agent/</div>
+        <div class="d">FastAPI :8000<br>DeepSeek + bge-m3 + reranker + BM25</div>
+      </div>
+      <div class="box layer l-data">
+        <div class="t">推荐系统 · recommend/</div>
+        <div class="d">TF 双塔<br><span style="color:#e04a5f">模型未训练 → 热门兜底</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--client)"></i>客户端</span>
+    <span><i style="background:var(--backend)"></i>后端</span>
+    <span><i style="background:var(--agent)"></i>Agent</span>
+    <span><i style="background:var(--data)"></i>数据 / 模型</span>
+  </div>
+
+  <h3>三条主要请求链路</h3>
+  <div class="flows">
+
+    <div class="flow">
+      <div class="fh"><span class="pill p-green">链路 A</span><b>首页 / 列表数据</b></div>
+      <div class="chain">
+        <span class="node"><b>App</b><span class="sm">Home.ets</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>Koa</b><span class="sm">/getSwiper<br>/getRecommendSongs</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>Sequelize</b><span class="sm">SELECT …</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>MySQL</b><span class="sm">14 表</span></span>
+      </div>
+      <div class="note">纯读库。推荐那条会先 exec 子进程调 Python，失败则 catch 降级为按 id 取前 N 首。</div>
+    </div>
+
+    <div class="flow">
+      <div class="fh"><span class="pill p-blue">链路 B</span><b>播放音乐</b></div>
+      <div class="chain">
+        <span class="node"><b>AVPlayer</b><span class="sm">Play.ets</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>GET /stream/{id}</b><span class="sm">Koa</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>302 重定向</b><span class="sm">拼 client_id</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>Jamendo</b><span class="sm">音频 CDN</span></span>
+      </div>
+      <div class="note">client_id 只存 .env，不落库、不下发；302 地址里仍可见（公开 API 的固有限制）。</div>
+    </div>
+
+    <div class="flow">
+      <div class="fh"><span class="pill p-purple">链路 C</span><b>AI 搜歌（核心）</b></div>
+      <div class="chain">
+        <span class="node"><b>AiSearch.ets</b><span class="sm">requestInStream</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>POST /agent/chat</b><span class="sm">Koa · JWT</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>Agent :8000</b><span class="sm">①→⑤ 流水线</span></span>
+        <span class="sep">→</span>
+        <span class="node"><b>SSE 回包</b><span class="sm">status ×2 + result</span></span>
+      </div>
+      <div class="note">Koa 先把「正在理解 / 正在检索」两条 status 发给客户端，再等 Agent 返回，最后一次性发 result。</div>
+    </div>
+  </div>
+
+  <!-- ============ 第二部分 ============ -->
+  <h2><span class="n">02</span>搜歌 Agent 的具体实现</h2>
+
+  <div class="pipe">
+
+    <div class="stage">
+      <div class="rail"><div class="dot">①</div><div class="vline"></div></div>
+      <div class="scard">
+        <div class="sh"><span class="sn">意图解析</span><span class="file">agent/core/intent.py</span>
+          <span class="pill p-purple">调 LLM</span></div>
+        <div class="io">
+          <div><div class="k">输入</div><div class="v">用户一句话</div></div>
+          <div><div class="k">输出</div><div class="v"><code>Intent{}</code>：intents / title / artist /
+            lyric_fragment / filters（硬约束）/ soft_tags / semantic_query / count</div></div>
+        </div>
+        <div class="note">DeepSeek JSON 模式 + 代码里按词表校验（模型输出词表外标签会被丢弃）。
+          歌名短查询走「快速通道」，不调 LLM：0 次调用、约 0.06s。</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="rail"><div class="dot">②</div><div class="vline"></div></div>
+      <div class="scard">
+        <div class="sh"><span class="sn">多路召回</span><span class="file">agent/core/recall.py</span></div>
+        <div class="io">
+          <div><div class="k">输入</div><div class="v"><code>Intent</code></div></div>
+          <div><div class="k">输出</div><div class="v"><code>routes{title, lyric, semantic, similar}</code>
+            ＋ <code>matches{ song_id → 命中那句歌词 }</code></div></div>
+        </div>
+        <div class="note">四路并行，每路 top-30。歌词路 = LIKE 命中 ＋ 词覆盖度 ＋ 向量相似度取 max，
+          再用交叉编码器对 top-15 重排。</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="rail"><div class="dot">③</div><div class="vline"></div></div>
+      <div class="scard">
+        <div class="sh"><span class="sn">排序融合</span><span class="file">agent/core/rank.py</span>
+          <span class="pill p-hot">两套逻辑</span></div>
+        <div class="io">
+          <div><div class="k">输入</div><div class="v"><code>Intent + routes + matches</code></div></div>
+          <div><div class="k">输出</div><div class="v"><code>[(song_id, score)]</code></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="rail"><div class="dot">④</div><div class="vline"></div></div>
+      <div class="scard">
+        <div class="sh"><span class="sn">校验 / 放宽 / 拒答</span><span class="file">agent/core/verify.py</span></div>
+        <div class="io">
+          <div><div class="k">输入</div><div class="v"><code>Intent + routes + 排序结果</code></div></div>
+          <div><div class="k">输出</div><div class="v">最终结果，或拒答文案</div></div>
+        </div>
+        <div class="note">放宽顺序固定：软偏好 → 场景 → 次要情绪 → 流派（最多 2 轮）；
+          <b>人声 / 语种 / 时长永不放宽</b>。点名的歌或歌手不在库、歌手对不上 → 拒答。</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="rail"><div class="dot">⑤</div></div>
+      <div class="scard">
+        <div class="sh"><span class="sn">生成理由</span><span class="file">agent/core/respond.py</span>
+          <span class="pill p-purple">调 LLM</span></div>
+        <div class="io">
+          <div><div class="k">输入</div><div class="v">最终前 N 首的歌曲卡片</div></div>
+          <div><div class="k">输出</div><div class="v"><code>songs[SongHit + reason]</code></div></div>
+        </div>
+        <div class="note">模型只能从候选 song_id 里挑；歌名、歌手由数据库填 →
+          <b>结构上不可能编造曲库外的歌</b>。</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>③ 为什么歌词类要单独走一套</h3>
+  <div class="branch">
+    <div class="brow">
+      <div class="node" style="background:var(--agent-bg);border-color:#d9d2f0">
+        <b>routes</b><span class="sm">四路召回结果</span>
+      </div>
+    </div>
+    <div class="brow" style="color:#b6bfcc;font-size:18px">▼</div>
+    <div class="brow" style="gap:60px">
+      <span style="font-size:13px;font-weight:650">歌词类查询</span>
+      <span style="font-size:13px;font-weight:650">其他查询</span>
+    </div>
+    <div class="bcols">
+      <div class="bcol hot">
+        <div class="bt">歌词类 · 直接用歌词路线分数</div>
+        <div class="step">不参与 RRF 融合</div>
+        <div class="step">不做卡片重排</div>
+        <div class="step">每首歌取最好的一行，按分数排序</div>
+        <div class="step" style="color:var(--hot);font-weight:600">原因：卡片文本里没有那句歌词，
+          交叉编码器会把正确歌打到第 13–29 名</div>
+      </div>
+      <div class="bcol">
+        <div class="bt">其他类 · 融合 + 精排</div>
+        <div class="step">RRF 融合各路结果</div>
+        <div class="step">元数据硬过滤（人声/语种/时长）</div>
+        <div class="step">bge-reranker 对歌曲卡片重排</div>
+        <div class="step">歌名被点名的置顶</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>工具层（8 个只读工具 · 契约 C7）</h3>
+  <table>
+    <tr><th style="width:200px">工具</th><th>实现</th></tr>
+    <tr><td class="mono">search_by_keyword</td><td>歌名 / 歌手的 LIKE 匹配</td></tr>
+    <tr><td class="mono">filter_by_tags</td><td>SQL 过滤：同类标签任一满足，跨类必须同时满足</td></tr>
+    <tr><td class="mono">semantic_search</td><td>歌曲级向量近邻（bge-m3）</td></tr>
+    <tr><td class="mono">similar_songs</td><td>向量近邻，排除同歌手与种子本身</td></tr>
+    <tr><td class="mono">search_by_lyrics</td><td>LIKE ＋ 歌词向量，RRF 融合，带回命中句与时间戳</td></tr>
+    <tr><td class="mono">get_song_detail</td><td>完整歌曲信息</td></tr>
+    <tr><td class="mono">get_user_profile</td><td>收藏/播放记录里出现最多的标签</td></tr>
+    <tr><td class="mono">recommend_for_user</td><td>标签偏好推荐（双塔未重训，属降级实现）</td></tr>
+  </table>
+
+  <h3>评测体系</h3>
+  <div class="flow">
+    <div class="chain">
+      <span class="node"><b>golden_dev</b><span class="sm">159 条</span></span>
+      <span class="node"><b>golden_test</b><span class="sm">74 条</span></span>
+      <span class="node"><b>golden_holdout_f1</b><span class="sm">40 条 · 只跑一次</span></span>
+      <span class="sep">→</span>
+      <span class="node"><b>run_eval</b><span class="sm">对比 B0–B3 基线</span></span>
+      <span class="sep">→</span>
+      <span class="node"><b>run_ablation</b><span class="sm">每次关一个模块</span></span>
+      <span class="sep">→</span>
+      <span class="node"><b>diagnose_stages</b><span class="sm">逐条定位丢在哪步</span></span>
+    </div>
+    <div class="note">阶段 3 从 0.633 提到 1.0，靠的就是最后这个工具——修了 4 个实现 bug，没有引入任何新技术。</div>
+  </div>
+
+  <table style="margin-top:14px">
+    <tr><th>test 集（k=5）</th><th>Agent</th><th>B1 整库塞 prompt</th><th>B2 单次向量</th><th>B0 直接猜</th></tr>
+    <tr><td>title+lyric+describe 合并 Hit@5</td><td><b>1.000</b></td><td>0.610</td><td>0.780</td><td>≈0</td></tr>
+    <tr><td>其中歌词片段 Hit@5</td><td><b>1.000</b></td><td>0.125</td><td>0.625</td><td>0.042</td></tr>
+    <tr><td>曲库没有时的拒答率</td><td><b>1.000</b></td><td>0.067</td><td>0</td><td>—</td></tr>
+  </table>
+
+  <div class="foot">
+    消融结论：贡献最大的是「意图解析」——关掉后 lyric 从 1.0 掉到 0.25、拒答掉到 0。<br>
+    当前降级项：推荐模型未训练（热门兜底）；裸歌词不带「歌词是」提示会被误判成歌名。
+  </div>
+
+</div>
+</body>
+</html>

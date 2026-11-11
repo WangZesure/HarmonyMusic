@@ -95,12 +95,12 @@ struct Play {
                 })
               }
               .margin({
-                top: '100lpx'
+                top: '40lpx'
               })
-              .width('90%')
+              .width('74%')
               .aspectRatio(1)
               .justifyContent(FlexAlign.Center)
-              .padding('48lpx')
+              .padding('24lpx')
               // 唱针
               Image($r('app.media.ic_stylus'))
                 .width('400lpx')
@@ -115,94 +115,70 @@ struct Play {
                 })
             }
             // 歌曲信息
-            Stack() {
-              Column({ space:'16lpx' }) {
-                Text(this.playState.name)
-                  .fontSize('54lpx')
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor("#4bb0c4")
-              }
-              .layoutWeight(1)
-              .justifyContent(FlexAlign.Center)
-              .zIndex(1)
-              .translate({
-                x: this.randomShakenX,
-                y: this.randomShakenY
-              })
-              Column({ space:'16lpx' }) {
-                Text(this.playState.name)
-                  .fontSize('54lpx')
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor('#ec5c87')
-              }
-              .layoutWeight(1)
-              .justifyContent(FlexAlign.Center)
-              .zIndex(2)
-              .translate({
-                x: this.randomShakenX,
-                y: this.randomShakenY
-              })
-              Column({ space: '16lpx' }) {
-                Text(this.playState.name)
-                  .fontSize('54lpx')
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor(Color.White)
-              }
-              .layoutWeight(1)
-              .justifyContent(FlexAlign.Center)
-              .zIndex(3)
+            Column({ space: '10lpx' }) {
+              Text(this.playState.isPlay ? '正在播放' : '已暂停')
+                .fontSize('22lpx')
+                .fontColor('#8B7BA8')
+                .letterSpacing(4)
+              Text(this.playState.name)
+                .fontSize('52lpx')
+                .fontWeight(FontWeight.Bold)
+                .fontColor(Color.White)
+                .maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .textAlign(TextAlign.Center)
             }
             .layoutWeight(1)
+            .width('100%')
+            .constraintSize({ minHeight: '150lpx' })
+            .justifyContent(FlexAlign.Center)
+            .padding({ left: '48lpx', right: '48lpx' })
             // 操作
-            Row() {
-              Badge({ value: '99+', style: { badgeSize: '24lpx', badgeColor: '#45CCCCCC' } }) {
-                Image($r("app.media.ic_like"))
-                  .fillColor(Color.White)
-                  .width('48lpx')
-              }
-              Badge({ value: '10W', style: { badgeSize: '24lpx', badgeColor: '#45cccccc' } }) {
-                Image($r("app.media.ic_comment_o"))
-                  .fillColor(Color.White)
-                  .width('36lpx')
-              }
-              Badge({ value: 'hot', style: { badgeSize: '24lpx', badgeColor: '#a8ff3131' } }) {
-                Image($r("app.media.ic_bells_o"))
-                  .fillColor(Color.White)
-                  .width('48lpx')
-              }
-
-              Badge({ value: 'vip', style: { badgeSize: 12, badgeColor: '#b7efd371' } }) {
-                Image($r("app.media.ic_download_o"))
-                  .fillColor(Color.White)
-                  .width('48lpx')
-              }
+            Row({ space: '88lpx' }) {
+              Image($r("app.media.ic_like"))
+                .fillColor('#B9AECB')
+                .width('44lpx')
+                .aspectRatio(1)
+              Image($r("app.media.ic_comment_o"))
+                .fillColor('#B9AECB')
+                .width('44lpx')
+                .aspectRatio(1)
+              Image($r("app.media.ic_bells_o"))
+                .fillColor('#B9AECB')
+                .width('44lpx')
+                .aspectRatio(1)
+              Image($r("app.media.ic_download_o"))
+                .fillColor('#B9AECB')
+                .width('44lpx')
+                .aspectRatio(1)
             }
             .width('100%')
-            .justifyContent(FlexAlign.SpaceAround)
+            .justifyContent(FlexAlign.Center)
+            .margin({ bottom: '8lpx' })
             // 播放
             Column() {
               // 进度条
               Row({ space:'8lpx' }) {
                 Text(this.number2time(this.playState.time))
                   .fontSize('24lpx')
-                  .fontColor(Color.White)
+                  .fontColor('#8B7BA8')
                 Slider({
                   value: this.playState.time,
                   min: 0,
                   max: this.playState.duration
                 })
                   .layoutWeight(1)
-                  .blockColor(Color.White)
-                  .selectedColor(Color.White)
-                  .trackColor('#ccc5c5c5')
-                  .trackThickness(2)
+                  .blockColor('#A855F7')
+                  .selectedColor('#A855F7')
+                  .trackColor('#332B45')
+                  .trackThickness(4)
                   .onChange((time)=>{
                     AvPlayerUtils.player.seek(time)  // AvPlayerUtils.player.seek跳转到指定时间
                   })
 
                 Text(this.number2time(this.playState.duration))
                   .fontSize('24lpx')
-                  .fontColor(Color.White)
+                  .fontColor('#8B7BA8')
               }
               .width('100%')
               .padding('48lpx')
@@ -210,21 +186,21 @@ struct Play {
               Row() {
                 if(this.playState.playMode==='auto'){
                   Image($r("app.media.ic_auto"))
-                    .fillColor(Color.White)
+                    .fillColor('#D8CFE8')
                     .width('60lpx')
                     .onClick(()=>{
                       AvPlayerUtils.changeMode('repeat')
                     })
                 }else if(this.playState.playMode==='repeat'){
                   Image($r("app.media.ic_repeat"))
-                    .fillColor(Color.White)
+                    .fillColor('#D8CFE8')
                     .width('60lpx')
                     .onClick(()=>{
                       AvPlayerUtils.changeMode('random')
                     })
                 }else if(this.playState.playMode==='random'){
                   Image($r("app.media.ic_random"))
-                    .fillColor(Color.White)
+                    .fillColor('#D8CFE8')
                     .width('60lpx')
                     .onClick(()=>{
                       AvPlayerUtils.changeMode('auto')
@@ -232,29 +208,38 @@ struct Play {
                 }
 
                 Image($r('app.media.ic_prev'))
-                  .fillColor(Color.White)
+                  .fillColor('#D8CFE8')
                   .width('60lpx')
                   .onClick(()=>{
                     AvPlayerUtils.prev()
                   })
 
                 // 播放按钮
-                Image(this.playState.isPlay?$r('app.media.ic_paused'):$r('app.media.ic_play'))
-                  .fillColor(Color.White)
-                  .width('100lpx')
-                  .onClick(()=>{
-                      this.playState.isPlay? AvPlayerUtils.pause(): AvPlayerUtils.playSingle(this.playState.playList[this.playState.playIndex])
-                  })
+                Row() {
+                  Image(this.playState.isPlay?$r('app.media.ic_paused'):$r('app.media.ic_play'))
+                    .fillColor(Color.White)
+                    .width('72lpx')
+                    .aspectRatio(1)
+                }
+                .width('132lpx')
+                .aspectRatio(1)
+                .borderRadius('66lpx')
+                .backgroundColor('#A855F7')
+                .justifyContent(FlexAlign.Center)
+                .shadow({ radius: 28, color: '#66A855F7', offsetX: 0, offsetY: 10 })
+                .onClick(()=>{
+                    this.playState.isPlay? AvPlayerUtils.pause(): AvPlayerUtils.playSingle(this.playState.playList[this.playState.playIndex])
+                })
                 // 下一首
                 Image($r('app.media.ic_next'))
-                  .fillColor(Color.White)
+                  .fillColor('#D8CFE8')
                   .width('60lpx')
                   .onClick(()=>{
                     AvPlayerUtils.next()
                   })
                 // 播放列表
                 Image($r('app.media.ic_song_list'))
-                  .fillColor(Color.White)
+                  .fillColor('#D8CFE8')
                   .width('60lpx')
                   .onClick(() => {
                     this.panelHeight = '100%'
@@ -270,7 +255,10 @@ struct Play {
           }
           .layoutWeight(1)
           .width('100%')
-          .backgroundColor(Color.Gray)
+          .linearGradient({
+            angle: 180,
+            colors: [['#221A33', 0.0], ['#171222', 0.45], ['#0C0A12', 1.0]]
+          })
         }
       }
       .backgroundColor(Color.Transparent)

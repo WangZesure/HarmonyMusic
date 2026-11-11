@@ -78,10 +78,14 @@ export struct Home{
         .itemHeight('30lpx')
         .selectedItemWidth('60lpx')
         .selectedItemHeight('30lpx')
-        .color('#999999')
-        .selectedColor('#ff6600')
+        .color('#4A3F63')
+        .selectedColor('#A855F7')
     )
     .height('460lpx')
+    .width('92%')
+    .borderRadius('24lpx')
+    .clip(true)
+    .margin({ top: '8lpx', bottom: '8lpx' })
   }
   @Builder
   getSongListWidget(){
@@ -107,15 +111,15 @@ export struct Home{
                   Text(item.name)
                     .fontSize('32lpx')
                     .fontWeight(FontWeight.Medium)
-                    .fontColor('#FF000000')
+                    .fontColor(Color.White)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  
+
                   // 推荐标签
                   Text('AI推荐')
                     .fontSize('20lpx')
-                    .fontColor('#FF007DFF')
-                    .backgroundColor('#1A007DFF')
+                    .fontColor('#C9A6FF')
+                    .backgroundColor('#2A2140')
                     .padding({ left: '8lpx', right: '8lpx', top: '4lpx', bottom: '4lpx' })
                     .borderRadius('8lpx')
                 }
@@ -126,14 +130,14 @@ export struct Home{
                 if (item.singer?.name) {
                   Text(item.singer.name)
                     .fontSize('24lpx')
-                    .fontColor('#FF666666')
+                    .fontColor('#A8A3B8')
                     .margin({ top: '8lpx' })
                 }
-                
+
                 if (item.reason) {
                   Text(item.reason)
                     .fontSize('20lpx')
-                    .fontColor('#FF999999')
+                    .fontColor('#8B7BA8')
                     .margin({ top: '8lpx' })
                 }
               }
@@ -146,21 +150,16 @@ export struct Home{
                 .width('48lpx')
                 .height('48lpx')
                 .fontSize('24lpx')
-                .fontColor('#FF007DFF')
+                .fontColor('#A855F7')
                 .textAlign(TextAlign.Center)
                 .borderRadius('24lpx')
-                .backgroundColor('#F0F0F0')
+                .backgroundColor('#2A2140')
             }
             .width('100%')
             .padding('16lpx')
-            .backgroundColor('#FFFFFFFF')
+            .backgroundColor('#1C1826')
             .borderRadius('16lpx')
-            .shadow({
-              radius: 8,
-              color: '#1F000000',
-              offsetX: 0,
-              offsetY: 2
-            })
+            .border({ width: 1, color: '#2B2538' })
             .onClick(() => {
               // 播放推荐歌曲
               this.playRecommendSong(item);
@@ -196,7 +195,7 @@ export struct Home{
                 Text(item.title)
                   .textAlign(TextAlign.Start)
                   .fontSize('24lpx')
-                  .fontColor(Color.Black)
+                  .fontColor(Color.White)
                   .maxLines(2)
                   .textOverflow({
                     overflow: TextOverflow.Ellipsis
@@ -275,7 +274,7 @@ export struct Home{
                 Text(item.name)
                   .textAlign(TextAlign.Start)
                   .fontSize('24lpx')
-                  .fontColor('#FFE9DFDF')
+                  .fontColor(Color.White)
                   .maxLines(2)
                   .textOverflow({
                     overflow: TextOverflow.Ellipsis
@@ -313,10 +312,10 @@ export struct Home{
     Row() {
       Text(title)
         .fontWeight(FontWeight.Bold)
-        .fontColor(Color.Black)
+        .fontColor(Color.White)
         .fontSize('36lpx')
       Text('更多')
-        .fontColor(Color.Gray)
+        .fontColor('#8B7BA8')
         .onClick(() => {
           if (title=='推荐歌单') {
             router.pushUrl({url:'pages/AllSongList'})
@@ -333,32 +332,42 @@ export struct Home{
   // 搜索框
   @Builder
   SearchInput() {
-    Row() {
+    Row({ space: '16lpx' }) {
       Row({ space: '8lpx' }) {
         Image($r('app.media.ic_search'))
           .width('40lpx')
           .aspectRatio(1)
-          .fillColor('#6a828e')
+          .fillColor('#8B7BA8')
         Text('生如夏花🔥')
-          .fontColor('#6a828e')
+          .fontColor('#8B7BA8')
+          .fontSize('28lpx')
           .layoutWeight(1)
-        Image($r('app.media.ic_code'))
-          .width('40lpx')
-          .aspectRatio(1)
-          .fillColor('#6a828e')
       }
-      .width('100%')
+      .layoutWeight(1)
       .padding('24lpx')
       .borderRadius('60')
-      .backgroundColor('#cccccc')
+      .backgroundColor('#1C1826')
       .onClick(()=> {
         router.pushUrl({
           url: "pages/Search1"
         })
       })
+
+      Text('AI 搜歌')
+        .fontSize('24lpx')
+        .fontWeight(FontWeight.Medium)
+        .fontColor(Color.White)
+        .padding({ left: '24lpx', right: '24lpx', top: '22lpx', bottom: '22lpx' })
+        .borderRadius('48lpx')
+        .backgroundColor('#A855F7')
+        .shadow({ radius: 18, color: '#55A855F7', offsetX: 0, offsetY: 6 })
+        .onClick(() => {
+          router.pushUrl({ url: 'pages/AiSearch' })
+        })
     }
     .width('100%')
-    .padding('24lpx')
+    .alignItems(VerticalAlign.Center)
+    .padding({ left: '24lpx', right: '24lpx', top: '16lpx', bottom: '12lpx' })
   }
   build() {
     Column() {
@@ -373,5 +382,6 @@ export struct Home{
     }
     .width('100%')
     .height('100%')
+    .backgroundColor('#0E0C14')
   }
 }

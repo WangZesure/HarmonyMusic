@@ -114,8 +114,8 @@ struct AiSearch {
   Bubble(m: AiMsg) {
     Column() {
       Text(m.text)
-        .fontColor(m.role === 'user' ? Color.White : '#333')
-        .backgroundColor(m.role === 'user' ? '#753061' : (m.role === 'status' ? '#f0eef5' : '#ffffff'))
+        .fontColor(m.role === 'user' ? Color.White : '#E8E4F2')
+        .backgroundColor(m.role === 'user' ? '#A855F7' : (m.role === 'status' ? '#2A2140' : '#1C1826'))
         .padding('16lpx')
         .borderRadius('16lpx')
         .width(m.role === 'status' ? '70%' : 'auto')
@@ -125,12 +125,12 @@ struct AiSearch {
             Image(Config.resolveUrl(s.pic || '')).width('80lpx').height('80lpx').borderRadius('10lpx')
               .margin({ right: '16lpx' })
             Column() {
-              Text(s.name).fontSize('26lpx').fontWeight(FontWeight.Bold).maxLines(1)
-              Text(s.artist).fontSize('22lpx').fontColor('#888')
-              if (s.reason) { Text(s.reason).fontSize('20lpx').fontColor('#666').maxLines(2) }
+              Text(s.name).fontSize('26lpx').fontWeight(FontWeight.Bold).fontColor(Color.White).maxLines(1)
+              Text(s.artist).fontSize('22lpx').fontColor('#A8A3B8')
+              if (s.reason) { Text(s.reason).fontSize('20lpx').fontColor('#8B7BA8').maxLines(2) }
             }.alignItems(HorizontalAlign.Start).layoutWeight(1)
           }
-          .width('100%').padding('14lpx').backgroundColor('#ffffff').borderRadius('12lpx').margin({ top: '10lpx' })
+          .width('100%').padding('14lpx').backgroundColor('#241E33').borderRadius('12lpx').margin({ top: '10lpx' })
           .onClick(() => { this.playSong(s) })
         }, (s: AiSong) => s.song_id.toString())
       }
@@ -146,13 +146,14 @@ struct AiSearch {
       Row() {
         Text('‹').fontSize('44lpx').fontColor(Color.White).onClick(() => { router.back() })
         Text('AI 搜歌').fontSize('34lpx').fontColor(Color.White).fontWeight(FontWeight.Bold).margin({ left: '10lpx' })
-      }.width('100%').height('90lpx').padding({ left: '20lpx' }).backgroundColor('#753061')
+      }.width('100%').height('90lpx').padding({ left: '20lpx' }).backgroundColor('#17141F')
+        .border({ width: { bottom: 1 }, color: '#2B2538' })
 
       // 对话区
       Scroll(this.scroller) {
         Column() {
           ForEach(this.msgs, (m: AiMsg) => { this.Bubble(m) }, (m: AiMsg, i: number) => i.toString())
-          if (this.loading) { Text('…').fontColor('#888').margin({ top: '14lpx' }) }
+          if (this.loading) { Text('…').fontColor('#8B7BA8').margin({ top: '14lpx' }) }
         }
         .width('100%')
         .padding('20lpx')
@@ -163,12 +164,13 @@ struct AiSearch {
       // 输入区
       Row() {
         TextInput({ text: this.input, placeholder: '说一句话找歌，如“深夜伤感的粤语歌”' })
-          .layoutWeight(1).backgroundColor('#ffffff').borderRadius('24lpx')
+          .layoutWeight(1).backgroundColor('#1C1826').fontColor(Color.White)
+          .placeholderColor('#6E6880').borderRadius('24lpx')
           .onChange((v: string) => { this.input = v })
           .onSubmit(() => { this.send() })
-        Button('发送').margin({ left: '12lpx' }).onClick(() => { this.send() })
-      }.width('100%').padding('16lpx').backgroundColor('#eeeeee')
+        Button('发送').margin({ left: '12lpx' }).backgroundColor('#A855F7').onClick(() => { this.send() })
+      }.width('100%').padding('16lpx').backgroundColor('#17141F')
     }
-    .width('100%').height('100%').backgroundColor('#f4f4f8')
+    .width('100%').height('100%').backgroundColor('#0E0C14')
   }
 }

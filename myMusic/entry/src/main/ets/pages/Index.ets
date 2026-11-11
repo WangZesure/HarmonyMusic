@@ -94,21 +94,21 @@ struct Index {
     Column() {
       Row() {
         Image(item.icon)
-          .fillColor(Color.White)
+          .fillColor(item.index === this.currentIndex ? '#A855F7' : '#6E6880')
           .width(item.index === this.currentIndex ? '35lpx' : '40lpx')
           .aspectRatio(1)
       }
       .width('40lpx')
       .aspectRatio(1)
       .borderRadius('40lpx')
-      .backgroundColor(item.index === this.currentIndex ? '#753061' : Color.Transparent)
+      .backgroundColor(item.index === this.currentIndex ? '#2A2140' : Color.Transparent)
       .justifyContent(FlexAlign.Center)
 
       Text(item.title)
         .fontSize('22lpx')
-        .fontWeight(FontWeight.Bold)
+        .fontWeight(item.index === this.currentIndex ? FontWeight.Bold : FontWeight.Normal)
         .margin({ top: '10lpx' })
-        .fontColor(item.index === this.currentIndex ? '#753061' : '#ffffff')
+        .fontColor(item.index === this.currentIndex ? '#C9A6FF' : '#6E6880')
     }
     .width('100%')
     .justifyContent(FlexAlign.Center)
@@ -143,10 +143,11 @@ struct Index {
 
           }
           .tabBar(this.TabBarWidget(item))
-          .backgroundColor('#eeeeee')
+          .backgroundColor('#0E0C14')
         }, (item: TabBarModel) => item.name)
       }
       .barHeight('110lpx')
+      .barBackgroundColor('#17141F')
       .onChange(index => {
         this.currentIndex = index
         if (index == 1) { //点击tab切换进入到
@@ -176,18 +177,10 @@ struct Index {
           })
       }
 
-      // AI 搜歌入口
-      Button('AI 搜歌')
-        .fontSize('22lpx')
-        .height('56lpx')
-        .backgroundColor('#753061')
-        .position({ x: '74%', y: '70lpx' })
-        .onClick(() => {
-          router.pushUrl({ url: 'pages/AiSearch' })
-        })
+      // AI 搜歌入口已并入首页搜索栏右侧，这里不再叠加浮动按钮
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#4781c3')
+    .backgroundColor('#0E0C14')
   }
 }

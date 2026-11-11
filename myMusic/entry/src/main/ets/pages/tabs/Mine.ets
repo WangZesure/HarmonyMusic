@@ -74,7 +74,7 @@ export struct Mine {
       }
       .padding('32lpx')
       .margin({ top: '40lpx' })
-      .backgroundColor('#F5F5F5')
+      .backgroundColor('#1C1826')
       .borderRadius('24lpx')
       .height('400lpx')
       .width('100%')
@@ -84,7 +84,7 @@ export struct Mine {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#EEEEEE')
+    .backgroundColor('#0E0C14')
   }
 
   // 构建用户信息区
@@ -96,6 +96,7 @@ export struct Mine {
         .width('100%')
         .height('400lpx')
         .objectFit(ImageFit.Cover)
+        .opacity(0.30)
         .zIndex(1)
       //用户头像 和用户名
       Row() {
@@ -113,14 +114,15 @@ export struct Mine {
             Column() {
               Text(`${this.userInfo.username}`)
                 .fontSize("38lpx")
+                .fontColor(Color.White)
               Text(`${this.userInfo.introduction}`)
                 .fontSize("26lpx")
-                .fontColor('#666666')
+                .fontColor('#A8A3B8')
             }.alignItems(HorizontalAlign.Start)
             .height("148lpx")
             .justifyContent(FlexAlign.SpaceEvenly)
           } else {
-            Text("登录/注册").fontSize("33lpx").fontColor('#666666').width("100%").onClick(() => {
+            Text("登录/注册").fontSize("33lpx").fontColor('#A8A3B8').width("100%").onClick(() => {
               router.pushUrl({
                 // was "pages/pass/CodeLoginStepOne" — that page does not exist and is not in
                 // main_pages.json, so the button silently did nothing. pages/Login is the real one.
@@ -142,6 +144,10 @@ export struct Mine {
 
     }
     .width('100%')
+    .linearGradient({
+      angle: 180,
+      colors: [['#2A1B3D', 0.0], ['#171222', 0.6], ['#0E0C14', 1.0]]
+    })
   }
 
   // 构建功能选项Item
@@ -151,11 +157,11 @@ export struct Mine {
       Image(item.icon)
         .width('48lpx')
         .height('48lpx')
-        .fillColor(Color.Grey)
+        .fillColor('#8B7BA8')
       Text(item.name)
         .fontSize('32lpx')
         .margin({ left: '32lpx' })
-        .fontColor('#333333')
+        .fontColor('#FFFFFF')
       Blank() // 推到右侧
       Image($r('app.media.right_arrow'))
         .width('32lpx')
@@ -172,7 +178,8 @@ export struct Mine {
     Column() {
       Button('退出登录')
         .fontSize('28lpx')
-        .backgroundColor('#4781c3')
+        .fontColor('#C9A6FF')
+        .backgroundColor('#2A2140')
         .margin({ top: '40lpx' })
         .onClick(() => {
           if (!this.isLogin) {

@@ -159,7 +159,7 @@ export struct LikeSongList {
           .radialGradient({
             center: ['80%', '-10%'],
             radius: '100%',
-            colors: [['#ff865d13', 0.0], [Color.Transparent, 1.0]]
+            colors: [['#553A1F5C', 0.0], [Color.Transparent, 1.0]]
           })
           .padding(16)
 
@@ -171,7 +171,7 @@ export struct LikeSongList {
                   .width('32lpx')
                   .fillColor('#ff5186')
                 Text(`播放全部 (${this.mySongList.songs.length})`)
-                  .fontColor('#333333')
+                  .fontColor('#FFFFFF')
                   .fontSize('28lpx')
               }
             }
@@ -211,7 +211,7 @@ export struct LikeSongList {
                 ListItem() {
                   Row() {
                     Text('我是有底线的~')
-                      .fontColor(Color.Gray)
+                      .fontColor('#6E6880')
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.Center)
@@ -224,7 +224,7 @@ export struct LikeSongList {
             .layoutWeight(1)
             .bindSheet(this.isShowComment, this.myBuilder(), {
               height: '400lpx',
-              backgroundColor: '#ffffff',
+              backgroundColor: '#1C1826',
               maskColor: Color.Gray,
               onDisappear: () => {
                 this.isShowComment = false; // 确保任何方式关闭弹窗时状态都被更新
@@ -233,14 +233,14 @@ export struct LikeSongList {
           }
           .layoutWeight(1)
           .width('100%')
-          .backgroundColor('#cccccc')
+          .backgroundColor('#17141F')
           .borderRadius({ topLeft: '24lpx', topRight: '24lpx' })
         }
         .layoutWeight(1)
       }
       .width('100%')
       .height('100%')
-      .backgroundColor('#eeeeee')
+      .backgroundColor('#0E0C14')
     } else {
       Button('请求登录')
         .onClick(() => {
@@ -248,7 +248,7 @@ export struct LikeSongList {
             url: "pages/Login"
           })
         })
-        .backgroundColor('#4781c3')
+        .backgroundColor('#A855F7')
     }
   }
 }
