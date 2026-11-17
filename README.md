@@ -37,6 +37,9 @@ Koa 后端 (openKoa/)  ── Sequelize ──►  MySQL mymusic（14 张表，5
 
 ## 快速启动
 
+> **完整的搭建步骤（前置、数据库、向量索引、启动顺序、常见问题）见 [`SETUP.md`](SETUP.md)。**
+> 下面是精简版。
+
 > 前置：MySQL 8 在 `127.0.0.1:3306`，库名 `mymusic`（`root` / `123456`）。
 > Agent 和推荐系统需要 torch，用 `D:\apps\tools\Conda\python.exe`（系统 python 没有）。
 
@@ -88,6 +91,7 @@ cd openKoa && node bin/www
 
 | 想了解 | 去看 |
 |---|---|
+| **环境搭建与启动** | [`SETUP.md`](SETUP.md) |
 | 全部设计文档的索引与阅读顺序 | [`DocsForMusicAgent/README.md`](DocsForMusicAgent/README.md) |
 | 冻结契约（ID / 表 / 词表 / 接口） | [`DocsForMusicAgent/contracts_v1.md`](DocsForMusicAgent/contracts_v1.md) |
 | 设计取舍与已知短板 | [`DocsForMusicAgent/design_and_gaps.md`](DocsForMusicAgent/design_and_gaps.md) |
