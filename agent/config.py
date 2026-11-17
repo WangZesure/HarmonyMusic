@@ -25,5 +25,6 @@ LOG_DIR = dp.DATA_DIR / "agent_logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 TOOL_TIMEOUT_S = 20
+LLM_TIMEOUT_S = 30          # per-attempt; the Run deadline is still 45s
 DEFAULT_LIMIT = 10
 MAX_LIMIT = 20

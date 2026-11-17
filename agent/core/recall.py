@@ -201,16 +201,30 @@ def recall(intent: Intent, k: int = K):
         args = {"query": intent.semantic_query, "limit": k}
         if _has_filters(intent.filters):
             args["filters"] = intent.filters.model_dump(exclude_none=True)
-        res = registry.run("semantic_search", args)
-        routes["semantic"] = [i["song_id"] for i in (res.data or {}).get("items", [])]
+        # Call the tool function directly: registry.run would submit a nested job
+        # to the same worker pool that is already running this recall.
+        from agent.models import SemanticArgs
+        from agent.tools.vector import semantic_search
+        res = semantic_search(SemanticArgs(**args), {})
+        routes["semantic"] = ([i["song_id"] for i in (res.data or {}).get("items", [])]
+                              if res.ok else [])
+        if not res.ok:
+            meta.setdefault("route_errors", []).append(
+                "semantic:" + (res.error.code if res.error else "ERR"))
 
     if "similar" in intent.intents:
         seed_q = intent.title or intent.artist or intent.semantic_query
         seeds = [sid for sid, _ in bm25.search_titles(seed_q or "", 1)]
         if seeds:
             similar_seed = seeds[0]
-            res = registry.run("similar_songs", {"song_id": similar_seed, "limit": k})
-            routes["similar"] = [i["song_id"] for i in (res.data or {}).get("items", [])]
+            from agent.models import SimilarArgs
+            from agent.tools.vector import similar_songs
+            res = similar_songs(SimilarArgs(song_id=similar_seed, limit=k), {})
+            routes["similar"] = ([i["song_id"] for i in (res.data or {}).get("items", [])]
+                                 if res.ok else [])
+            if not res.ok:
+                meta.setdefault("route_errors", []).append(
+                    "similar:" + (res.error.code if res.error else "ERR"))
             # F3: the seed itself must never rank (it would win the name-bonus rule)
             for r in routes:
                 routes[r] = [s for s in routes[r] if s != similar_seed]

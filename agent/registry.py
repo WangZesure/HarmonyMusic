@@ -44,10 +44,14 @@ def run(name: str, raw_args: dict, ctx: dict | None = None) -> ToolResult:
     if name not in TOOLS:
         return ToolResult.fail("INVALID_ARGUMENT", f"unknown tool: {name}")
     args_model, fn, _ = TOOLS[name]
+    if not isinstance(raw_args, dict):
+        return ToolResult.fail("INVALID_ARGUMENT", "tool arguments must be a JSON object")
     try:
         args = args_model(**raw_args)
     except ValidationError as e:
         return ToolResult.fail("INVALID_ARGUMENT", str(e.errors()[:3]))
+    except TypeError as e:
+        return ToolResult.fail("INVALID_ARGUMENT", f"tool arguments must be an object: {e}")
     start = time.time()
     try:
         fut = _POOL.submit(fn, args, ctx)

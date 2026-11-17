@@ -474,9 +474,24 @@ exports.getPlayHistory = async (ctx) => {
 // 19 AI 搜歌（多轮）—— 转发到 Python Agent 服务，用 SSE 流式返回过程（阶段5）
 //     AGENT_URL 默认 http://127.0.0.1:8000（uvicorn agent.app:app）
 exports.agentChat = async (ctx) => {
-    const { message, sessionId = 'default' } = ctx.request.body || {}
+    const { message, sessionId = 'default', turnId } = ctx.request.body || {}
     if (!message) { ctx.status = 400; ctx.body = { code: 400, message: 'message 不能为空' }; return }
+    if (!ctx.user) {
+        // Optional auth route: keep the SSE contract so the client sees an error bubble.
+        ctx.respond = false
+        ctx.res.writeHead(200, {
+            'Content-Type': 'text/event-stream; charset=utf-8',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+        })
+        ctx.res.write(`event: error\ndata: ${JSON.stringify({ message: '请先登录' })}\n\n`)
+        ctx.res.end()
+        return
+    }
     const agentUrl = process.env.AGENT_URL || 'http://127.0.0.1:8000'
+    // Client-generated turn id enables retry idempotency; fall back to a Koa id.
+    const tid = turnId || `koa-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
     ctx.respond = false                                   // 自己写 res，交给 Koa 之外
     ctx.res.writeHead(200, {
@@ -486,24 +501,43 @@ exports.agentChat = async (ctx) => {
         'Access-Control-Allow-Origin': '*',
     })
     const send = (event, data) => ctx.res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+    // Total deadline + client-disconnect propagation. Listen on res: req's
+    // 'close' has already fired once bodyparser finished reading the body.
+    const ac = new AbortController()
+    let timedOut = false
+    const timer = setTimeout(() => { timedOut = true; ac.abort() },
+        Number(process.env.AGENT_TIMEOUT_MS || 150000))
+    let closed = false
+    const onClose = () => { closed = true; ac.abort() }
+    ctx.res.on('close', onClose)
 
     try {
-        send('status', { stage: 'understanding', text: '正在理解你的需求…' })
-        send('status', { stage: 'searching', text: '正在检索曲库…' })
-        const resp = await fetch(`${agentUrl}/agent/chat`, {
+        // Agent 侧是 SSE：status（每步）+ result（最终结构）。Koa 只做透传。
+        const resp = await fetch(`${agentUrl}/agent/chat/stream`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-User-Id': String(ctx.user.id) },
-            body: JSON.stringify({ session_id: sessionId, query: message }),
-            // Agent 冷启动要加载 bge-m3 + 重排模型（约 45s），20s 会误判为不可用。
-            // 60s 覆盖冷启动，热态下仍然是秒级。
-            signal: AbortSignal.timeout(Number(process.env.AGENT_TIMEOUT_MS || 60000)),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-User-Id': String(ctx.user.id),
+                ...(process.env.AGENT_KEY ? { 'X-Agent-Key': process.env.AGENT_KEY } : {}),
+            },
+            body: JSON.stringify({ session_id: sessionId, query: message, turn_id: tid }),
+            // 覆盖 50s 预热 + 45s Run 预算；热态下仍然是秒级。
+            signal: ac.signal,
         })
-        const json = await resp.json()
-        send('result', json.data || json)
+        if (!resp.ok || !resp.body) throw new Error(`agent status ${resp.status}`)
+        for await (const chunk of resp.body) ctx.res.write(chunk)
     } catch (e) {
-        send('error', { message: 'Agent 服务不可用: ' + (e.message || e) })
+        if (!closed) {
+            console.error('[agentChat] upstream failed:', e)
+            send('error', {
+                message: timedOut ? 'Agent 响应超时，请重试' : 'Agent 服务暂不可用，请稍后重试',
+            })
+        }
+    } finally {
+        clearTimeout(timer)
+        ctx.res.off('close', onClose)
     }
-    ctx.res.end()
+    if (!closed) ctx.res.end()
 }
 
 // 获取AI推荐单曲（基于机器学习模型）

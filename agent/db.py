@@ -159,3 +159,17 @@ def user_profile(user_id: int, limit: int) -> dict:
                 GROUP BY t.tag_type, t.tag ORDER BY c DESC LIMIT %s""",
              [user_id, user_id, int(limit)])
     return {"user_id": user_id, "top_tags": rows}
+
+
+def user_preferences(user_id: int) -> list[dict]:
+    """Explicit likes/dislikes written by remember_preference."""
+    return q("""SELECT tag, polarity, weight FROM user_preference
+                WHERE user_id=%s ORDER BY updated_at DESC""", [user_id])
+
+
+def execute(sql: str, params: list | tuple = ()) -> int:
+    """Write helper (the rest of this module is read-only by convention)."""
+    with connect().cursor() as cur:
+        cur.execute(sql, params)
+        return cur.rowcount
+

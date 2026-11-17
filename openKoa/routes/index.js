@@ -85,8 +85,8 @@ router.post('/uploads',upload.single('file'),async (ctx,next)=>{
   ctx.body = {code:200,message:'上传成功',data:file.filename}
 })
 
-// 19 AI 搜歌（多轮对话）SSE 流式；鉴权复用现有 JWT 中间件（阶段5）
-router.post('/agent/chat', verifyToken(), controller.agentChat)
+// 19 AI 搜歌（多轮对话）SSE 流式；鉴权在 controller 内以 SSE error 返回，避免 JSON 401 客户端读不到
+router.post('/agent/chat', verifyToken(false), controller.agentChat)
 
 // 20 听歌记录
 router.post('/addPlay', verifyToken(), controller.addPlay)

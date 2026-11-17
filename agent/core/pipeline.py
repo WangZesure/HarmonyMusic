@@ -11,11 +11,13 @@ from agent.core import verify
 from agent.core.intent import parse
 
 
-def _run(query: str, exclude=None, extra_soft=None, intent_override=None, gate: bool = True):
+def _run(query: str, exclude=None, extra_soft=None, intent_override=None, gate: bool = True,
+         relax: bool = True):
     """①→④. Returns (intent, ranked, matches, relaxed, trace, refuse_message|None).
 
     `gate=False` (continuation turns: 换一首 / 更X一点 / 不要X) lowers the confidence
-    threshold to `CONTINUATION_MIN` — see verify.CONTINUATION_MIN for why."""
+    threshold to `CONTINUATION_MIN` — see verify.CONTINUATION_MIN for why.
+    `relax=False` disables the automatic relax loop (the agent tool decides)."""
     trace = []
     exclude = set(exclude or ())
 
@@ -75,7 +77,7 @@ def _run(query: str, exclude=None, extra_soft=None, intent_override=None, gate: 
 
     cur = intent
     rounds = 0                                                            # ④
-    while (len(ranked) < cur.count or (ranked and ranked[0][1] < thr)) \
+    while relax and (len(ranked) < cur.count or (ranked and ranked[0][1] < thr)) \
             and rounds < verify.RELAX_MAX:
         seq = verify.relax_sequence(cur)
         if not seq:
@@ -113,8 +115,9 @@ def rank_ids(query: str, exclude=None, extra_soft=None, intent_override=None,
 
 
 def search(query: str, user_id: int | None = None, exclude=None,
-           extra_soft=None, intent_override=None, gate: bool = True) -> dict:
-    intent, ranked, matches, relaxed, trace, refuse, gray = _run(query, exclude, extra_soft, intent_override, gate)
+           extra_soft=None, intent_override=None, gate: bool = True, relax: bool = True) -> dict:
+    intent, ranked, matches, relaxed, trace, refuse, gray = _run(
+        query, exclude, extra_soft, intent_override, gate, relax)
     if refuse:
         return _result([], refuse, relaxed, trace)
     songs, message, reason_error = respond_mod.build(intent, ranked, matches, user_id=user_id)  # ⑤

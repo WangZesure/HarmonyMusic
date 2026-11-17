@@ -6,6 +6,7 @@ import { PlayStateModel } from '../model/PlayStateModel'
 import emitter from '@ohos.events.emitter'
 import { EmitEventType } from '../model/paramModel'
 import { AvPlayerUtils } from '../utils/AvPlayerUtils'
+import preferencesUtil from '../common/PreferencesUtil'
 
 @Component
 export struct Home{
@@ -371,13 +372,24 @@ export struct Home{
         .backgroundColor('#A855F7')
         .shadow({ radius: 18, color: '#55A855F7', offsetX: 0, offsetY: 6 })
         .onClick(() => {
-          router.pushUrl({ url: 'pages/AiSearch' })
+          // userInfo may still be {} right after a cold start; a persisted token
+          // is enough to enter. Expired tokens are handled inside AiSearch.
+          if (this.userInfo && this.userInfo['id']) {
+            router.pushUrl({ url: 'pages/AiSearch' })
+            return
+          }
+          this.openAiSearch()
         })
     }
     .width('100%')
     .alignItems(VerticalAlign.Center)
     .padding({ left: '24lpx', right: '24lpx', top: '16lpx', bottom: '12lpx' })
   }
+  private async openAiSearch() {
+    const token = await preferencesUtil.get('userinfoStore', 'token', '') as string
+    router.pushUrl({ url: token ? 'pages/AiSearch' : 'pages/Login' })
+  }
+
   build() {
     Column() {
       Scroll(){

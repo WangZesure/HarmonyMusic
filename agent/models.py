@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 MatchType = Literal["keyword", "lyric", "tag", "semantic", "similar", "cf"]
 ErrorCode = Literal["INVALID_ARGUMENT", "NOT_FOUND", "TIMEOUT", "UNAVAILABLE", "INTERNAL"]
@@ -16,6 +16,7 @@ class DurationRange(BaseModel):
 
 class Filter(BaseModel):
     """Shared by filter_by_tags and semantic_search (C7). Values come from vocab C3."""
+    model_config = ConfigDict(extra="forbid")   # wrong keys must fail, not be ignored
     genres: list[str] = Field(default_factory=list)
     moods: list[str] = Field(default_factory=list)
     scenes: list[str] = Field(default_factory=list)

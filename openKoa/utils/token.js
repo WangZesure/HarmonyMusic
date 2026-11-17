@@ -10,25 +10,29 @@ exports.verifyToken = (required=true) => {
     return async (ctx,next)=>{
         // 1. header 获取 token (前端用Authorization传回token)
         const token = ctx.header.authorization;
-        //console.log(token,'==================')
+        let user = null;
         if(token){
-            // 有token
             try{
                 // 2. 解密 token
-                const user = await jwt.verify(token,'secret');
-                //console.log(user) // {username:'13812323234345',id:1}
-                // 3. 把用户信息挂载到 ctx 上(全局属性 重要)
-                ctx.user = user;
-                await next();
+                user = await jwt.verify(token,'secret');
             }catch(err){
-                // 用 401 而不是 200：否则客户端无法区分「鉴权失败」和「成功但空数据」
-                ctx.status = 401;
-                ctx.body = {code:801,message:'token过期'};
+                // optional auth: let the route decide (e.g. SSE "请先登录")
+                if (required) {
+                    // 用 401 而不是 200：否则客户端无法区分「鉴权失败」和「成功但空数据」
+                    ctx.status = 401;
+                    ctx.body = {code:801,message:'token过期'};
+                    return;
+                }
             }
         }else if(required){
-             // 没token
-             ctx.status = 401;
-             ctx.body = {code:802,message:'token不存在'};
+            // 没token
+            ctx.status = 401;
+            ctx.body = {code:802,message:'token不存在'};
+            return;
         }
+        // 3. 把用户信息挂载到 ctx 上(全局属性 重要)
+        //    next() 放在 try 之外：下游异常不能被当成 token 过期。
+        if (user) { ctx.user = user; }
+        await next();
     }
 }

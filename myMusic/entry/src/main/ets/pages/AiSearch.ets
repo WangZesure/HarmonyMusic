@@ -21,6 +21,7 @@ interface AiSong {
   scenes?: string[]
 }
 interface AiMsg {
+  id: string            // stable ForEach key; status rows are removed on finish
   role: string          // 'user' | 'bot' | 'status'
   text: string
   songs?: AiSong[]
@@ -33,6 +34,14 @@ struct AiSearch {
   @State input: string = ''
   @State loading: boolean = false
   private sessionId: string = 'mobile-' + Date.now().toString()
+  private finished: boolean = false
+  private msgSeq: number = 0
+  private reqGen: number = 0
+
+  pushMsg(role: string, text: string, songs?: AiSong[]) {
+    this.msgSeq += 1
+    this.msgs.push({ id: 'm-' + this.msgSeq, role: role, text: text, songs: songs })
+  }
   private scroller: Scroller = new Scroller()
 
   async addToken(header: Record<string, string>): Promise<Record<string, string>> {
@@ -48,9 +57,12 @@ struct AiSearch {
       p.id = s.song_id
       const res: ResponseModel = await getSongDetail(p)
       if (res.success && res.data) {
-        const row = res.data[0] as Record<string, Object>
-        s.pic = row['pic'] as string
-        s.url = row['url'] as string
+        const arr = (res.data || []) as Array<Record<string, Object>>
+        if (arr.length > 0) {
+          const row = arr[0]
+          s.pic = row['pic'] as string
+          s.url = row['url'] as string
+        }
       }
     }
     return songs
@@ -60,13 +72,40 @@ struct AiSearch {
   async send() {
     const text = this.input.trim()
     if (!text || this.loading) { return }
+    this.reqGen += 1
+    const gen = this.reqGen
     this.loading = true
+    this.finished = false
     this.input = ''
-    this.msgs.push({ role: 'user', text: text })
+    this.msgs.push({ id: 'm-' + (++this.msgSeq), role: 'user', text: text })
     const req = http.createHttp()
     const decoder = new util.TextDecoder('utf-8')
     let buf = ''
+    let timer: number = -1
+    let settled: boolean = false
+    // 收尾（每个请求只执行一次）：清定时器、销毁请求、去掉状态行、结束 loading
+    const settle = () => {
+      if (settled) { return }
+      settled = true
+      clearTimeout(timer)
+      try { req.destroy() } catch (e) {}
+      this.msgs = this.msgs.filter((m: AiMsg) => m.role !== 'status')
+      this.loading = false
+    }
+    const finish = (err?: string) => {
+      if (gen !== this.reqGen || this.finished) { return }
+      this.finished = true
+      settle()
+      if (err) { this.pushMsg('bot', err) }
+    }
+    timer = setTimeout(() => {
+      if (gen !== this.reqGen || settled) { return }
+      this.finished = true
+      settle()
+      this.pushMsg('bot', '请求超时，请重试')
+    }, 170000)
     req.on('dataReceive', (data: ArrayBuffer) => {
+      if (gen !== this.reqGen) { return }
       buf += decoder.decodeWithStream(new Uint8Array(data), { stream: true })
       const blocks = buf.split('\n\n')
       buf = blocks.pop() as string
@@ -74,34 +113,83 @@ struct AiSearch {
         const ev = (b.match(/event: (.+)/) || [])[1]
         const da = (b.match(/data: (.+)/) || [])[1]
         if (!da) { continue }
-        const obj = JSON.parse(da) as Record<string, Object>
+        let obj: Record<string, Object>
+        try {
+          obj = JSON.parse(da) as Record<string, Object>
+        } catch (e) {
+          continue
+        }
         if (ev === 'status') {
-          this.msgs.push({ role: 'status', text: obj['text'] as string })
+          this.pushMsg('status', obj['text'] as string)
         } else if (ev === 'result') {
-          const items = (obj['songs'] || []) as AiSong[]
-          this.hydrate(items).then((songs: AiSong[]) => {
-            this.msgs.push({ role: 'bot', text: (obj['message'] as string) || '为你找到：', songs: songs })
-            this.loading = false
-          })
+          const type = (obj['type'] as string) || 'songs'
+          const deg = obj['degraded'] as Record<string, Object> | null
+          const suffix = deg ? '（结果可能不完整）' : ''
+          if (type === 'clarify') {
+            const q = (obj['question'] as string) || '需要你再补充一点信息'
+            const opts = (obj['options'] || []) as string[]
+            finish()
+            this.pushMsg('bot', opts.length ? `${q}\n${opts.join(' / ')}` : q)
+          } else if (type === 'songs') {
+            const items = (obj['songs'] || []) as AiSong[]
+            // 先认领结果，保持 loading/状态行，等补齐封面后再一次性落气泡，
+            // 避免 hydrate 期间用户重发导致答案被 reqGen 丢弃。
+            this.finished = true
+            // 结果已到，改用独立的 hydrate 超时（总超时 170s 不再适用）
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+              if (gen !== this.reqGen || settled) { return }
+              settle()
+              this.pushMsg('bot', '加载歌曲失败：请求超时')
+            }, 60000)
+            this.hydrate(items).then((songs: AiSong[]) => {
+              if (gen !== this.reqGen || settled) { return }
+              settle()
+              this.pushMsg('bot', ((obj['message'] as string) || '为你找到：') + suffix, songs)
+            }).catch((e: Error) => {
+              if (gen !== this.reqGen || settled) { return }
+              settle()
+              this.pushMsg('bot', '加载歌曲失败：' + (e.message || ''))
+            })
+          } else {
+            finish()
+            this.pushMsg('bot', ((obj['message'] as string) || '没有找到符合的歌') + suffix)
+          }
         } else if (ev === 'error') {
-          this.msgs.push({ role: 'bot', text: (obj['message'] as string) || '出错了' })
-          this.loading = false
+          const errMsg = (obj['message'] as string) || '出错了'
+          finish(errMsg)
+          if (errMsg.indexOf('请先登录') >= 0) {
+            setTimeout(() => { router.pushUrl({ url: 'pages/Login' }) }, 900)
+          }
         }
       }
     })
-    req.on('dataEnd', () => { this.loading = false })
+    req.on('dataEnd', () => {
+      if (gen !== this.reqGen) { return }
+      if (!this.finished) { finish('没有收到结果，请重试') }
+    })
     const header = await this.addToken({ 'Content-Type': 'application/json' })
     try {
       req.requestInStream(`${Config.SERVER}/agent/chat`, {
         method: http.RequestMethod.POST,
         header: header,
-        extraData: JSON.stringify({ message: text, sessionId: this.sessionId }),
+        extraData: JSON.stringify({
+          message: text,
+          sessionId: this.sessionId,
+          turnId: 'mobile-' + Date.now() + '-' + Math.floor(Math.random() * 1000000)
+        }),
         connectTimeout: 15000,
-        readTimeout: 60000
+        readTimeout: 180000
+      }).then(() => {
+        if (gen !== this.reqGen) { return }
+        if (!this.finished) { finish('没有收到结果，请重试') }
+      }).catch((e: Error) => {
+        if (gen !== this.reqGen) { return }
+        finish('连接失败：' + (e.message || JSON.stringify(e)))
+        try { req.destroy() } catch (err) {}
       })
     } catch (e) {
-      this.msgs.push({ role: 'bot', text: '连接失败：' + JSON.stringify(e) })
-      this.loading = false
+      finish('连接失败：' + JSON.stringify(e))
     }
   }
 
@@ -152,7 +240,7 @@ struct AiSearch {
       // 对话区
       Scroll(this.scroller) {
         Column() {
-          ForEach(this.msgs, (m: AiMsg) => { this.Bubble(m) }, (m: AiMsg, i: number) => i.toString())
+          ForEach(this.msgs, (m: AiMsg) => { this.Bubble(m) }, (m: AiMsg) => m.id)
           if (this.loading) { Text('…').fontColor('#8B7BA8').margin({ top: '14lpx' }) }
         }
         .width('100%')

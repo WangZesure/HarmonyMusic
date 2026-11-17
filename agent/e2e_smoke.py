@@ -21,11 +21,15 @@ import os
 import sys
 import urllib.error
 import urllib.request
+import uuid
 
 KOA = os.environ.get("KOA_URL", "http://127.0.0.1:3000")
 AGENT = os.environ.get("AGENT_URL", "http://127.0.0.1:8000")
 USER = os.environ.get("E2E_USER", "user1")
 PASSWORD = os.environ.get("E2E_PASSWORD", "123456")
+# Fresh sessions per run: a fixed sid would inherit the previous run's MySQL
+# state (seen/last_shown/recent) and make the smoke test non-reproducible.
+RUN = uuid.uuid4().hex[:6]
 
 _checks: list[tuple[bool, str]] = []
 
@@ -54,10 +58,31 @@ def sse_events(body: str) -> dict[str, list[str]]:
     return out
 
 
+def _get(url: str):
+    with urllib.request.urlopen(url, timeout=10) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def wait_agent(timeout_s: int = 90) -> bool:
+    """Wait for the warm-up thread (bge-m3 + reranker) before the first tool call."""
+    import time
+    end = time.time() + timeout_s
+    while time.time() < end:
+        try:
+            if _get(f"{AGENT}/health").get("ready"):
+                return True
+        except Exception:  # noqa: BLE001
+            pass
+        time.sleep(2)
+    return False
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     print(f"Koa={KOA}  Agent={AGENT}  user={USER}\n")
 
+    # 0) warm-up ---------------------------------------------------------------
+    check(wait_agent(), "Agent 已预热（/health.ready）")
     # 1) Agent service, direct -------------------------------------------------
     print("[1] POST /agent/search (直连 Agent)")
     try:
@@ -90,14 +115,14 @@ def main() -> int:
 
     # 3) single turn over SSE --------------------------------------------------
     print("\n[3] POST /agent/chat SSE（JWT → status → result）")
-    r, ev = chat("适合深夜一个人听的伤感歌曲", "e2e-single")
+    r, ev = chat("适合深夜一个人听的伤感歌曲", f"e2e-single-{RUN}")
     check(ev.get("status") is not None and "result" in ev, "SSE 事件含 status + result",
           f"{ {k: len(v) for k, v in ev.items()} }")
     check(len(r.get("songs") or []) > 0, "描述类查询返回歌曲", f"{len(r.get('songs') or [])} 首")
 
     # 4) multi-turn on a LYRIC session (F7 lives here) -------------------------
     print("\n[4] 多轮 · 歌词会话（F7 回归点）")
-    sid = "e2e-lyric"
+    sid = f"e2e-lyric-{RUN}"
     r1, _ = chat("有首歌歌词是 I search for the strength", sid)
     first = [s["name"] for s in r1.get("songs") or []]
     check(len(first) > 0, "turn1 歌词查询作答", f"{len(first)} 首")
@@ -111,10 +136,10 @@ def main() -> int:
 
     # 5) refusal path (must not have regressed) --------------------------------
     print("\n[5] 拒答不回退")
-    r5, _ = chat("Coldplay 的 Yellow", "e2e-refuse")
+    r5, _ = chat("Coldplay 的 Yellow", f"e2e-refuse-{RUN}")
+    text5 = (r5.get("message") or "") + (r5.get("question") or "")
     check(not (r5.get("songs") or []), "同名异歌手：不返回歌曲")
-    check("Coldplay" in (r5.get("message") or ""), "拒答文案点名 Coldplay",
-          (r5.get("message") or "")[:46])
+    check("Coldplay" in text5, "拒答/澄清文案点名 Coldplay", text5[:46])
 
     failed = [label for ok, label in _checks if not ok]
     print(f"\n{'=' * 62}\n{len(_checks) - len(failed)}/{len(_checks)} passed")

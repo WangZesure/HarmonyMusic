@@ -7,6 +7,7 @@ Otherwise DeepSeek returns JSON; tags are validated against the C3 vocab in code
 from __future__ import annotations
 
 import re
+from difflib import SequenceMatcher
 
 import yaml
 from pydantic import BaseModel, Field
@@ -112,7 +113,17 @@ def fast_path(query: str):
     import agent.db as db
     info = db.base_info([hits[0][0]])
     name = info.get(hits[0][0], {}).get("name", "")
-    if not (name and name.lower() in q.lower()):   # query must literally contain the title
+    if not name:
+        return None
+    # A short title inside a longer sentence ("tell me why" -> "Why") is not a
+    # title query. Require phrase-level containment or high similarity.
+    nl = name.lower().strip()
+    ql = re.sub(r"\s+", " ", q.lower()).strip()
+    if len(nl) < 4:
+        if ql != nl:
+            return None
+    elif not (ql == nl or ql.endswith(nl) or ql.startswith(nl)
+              or SequenceMatcher(None, ql, nl).ratio() >= 0.75):
         return None
     artist = None                                   # extract "<artist> 的 <title>" / "by <artist>"
     m = re.match(r"^(.*?)\s*的\s*(.+)$", q)

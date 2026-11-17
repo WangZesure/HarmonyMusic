@@ -35,8 +35,8 @@ def satisfies(sid: int, f) -> bool:
     t = db.tag_map([sid]).get(sid, {"genres": [], "moods": [], "scenes": []})
     if f.vocal and m.get("vocal") != f.vocal:
         return False
-    if f.languages and m.get("language") not in f.languages and m.get("language") not in ("und", None, "zxx"):
-        return False   # unknown language != mismatch, so only reject a KNOWN mismatch
+    if f.languages and m.get("language") not in f.languages:
+        return False   # strict, same as db.filter_songs: und/zxx/NULL cannot satisfy a language filter
     if f.duration_s:
         d = m.get("duration_s") or 0
         if f.duration_s.min is not None and d < f.duration_s.min:
@@ -117,7 +117,8 @@ def rank(intent: Intent, routes: dict[str, list[int]], matches: dict[int, dict],
     try:
         cards = _cards()
         ce = _reranker()
-        pairs = [(intent.semantic_query or intent.lyric_fragment or intent.title or "",
+        pairs = [(intent.semantic_query or intent.lyric_fragment or intent.title
+                  or intent.artist or "",
                   _candidate_text(s, matches.get(s), cards)) for s in cand]
         import math
         raw = ce.predict(pairs)

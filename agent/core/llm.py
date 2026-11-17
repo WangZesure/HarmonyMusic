@@ -26,9 +26,12 @@ class LLM:
             raise RuntimeError("DEEPSEEK_API_KEY not set in .env")
         self.model = model or dp.DEEPSEEK_CHAT_MODEL
         self.base_url = dp.DEEPSEEK_BASE_URL
-        self.client = OpenAI(api_key=dp.DEEPSEEK_API_KEY, base_url=dp.DEEPSEEK_BASE_URL)
+        self.client = OpenAI(api_key=dp.DEEPSEEK_API_KEY, base_url=dp.DEEPSEEK_BASE_URL,
+                             timeout=cfg.LLM_TIMEOUT_S, max_retries=0)
         # strict/json modes need the beta endpoint (phase3 §2.6)
-        self.beta_client = OpenAI(api_key=dp.DEEPSEEK_API_KEY, base_url=dp.DEEPSEEK_BASE_URL.rstrip("/") + "/beta")
+        self.beta_client = OpenAI(api_key=dp.DEEPSEEK_API_KEY,
+                                  base_url=dp.DEEPSEEK_BASE_URL.rstrip("/") + "/beta",
+                                  timeout=cfg.LLM_TIMEOUT_S, max_retries=0)
         self.stats = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0}
 
     def _cache_path(self, key: str) -> Path:
@@ -65,3 +68,35 @@ class LLM:
 
     def complete_json(self, messages: list[dict], **kw) -> dict:
         return json.loads(self.complete(messages, json_mode=True, **kw))
+
+    def chat(self, messages: list[dict], *, tools: list[dict] | None = None,
+             temperature: float = 0.0, timeout: float | None = None,
+             deadline: float | None = None, **kwargs):
+        """Tool-calling chat. No disk cache: agent decisions must be fresh."""
+        last_err = None
+        timeout = cfg.LLM_TIMEOUT_S if timeout is None else timeout
+        for attempt in range(3):
+            if deadline is not None and time.time() > deadline:
+                break
+            try:
+                resp = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    temperature=temperature,
+                    tools=tools,
+                    tool_choice="auto" if tools else None,
+                    timeout=timeout,
+                    **kwargs,
+                )
+                self.stats["calls"] += 1
+                if resp.usage:
+                    self.stats["prompt_tokens"] += resp.usage.prompt_tokens
+                    self.stats["completion_tokens"] += resp.usage.completion_tokens
+                return resp
+            except Exception as e:  # noqa: BLE001
+                last_err = e
+                if deadline is not None and time.time() + 1.5 * (attempt + 1) > deadline:
+                    break
+                time.sleep(1.5 * (attempt + 1))
+        raise RuntimeError(f"DeepSeek tool call failed: {last_err}")
+
