@@ -1,4 +1,4 @@
-# 验收清单（对照 featureToDo.md 六阶段）
+# 验收清单（对照六阶段计划）
 
 > 2026-10-13。逐阶段列出：交付物在哪、怎么验证、证据是什么。评审照着跑即可。
 
@@ -20,8 +20,8 @@
 ## 3. Agent 核心（单轮）
 - 交付：`agent/core/{intent,recall,rank,verify,respond,pipeline}.py`、`POST /agent/search`
 - 验证：`python -m agent.eval.run_eval ...`（成绩表）；`python -m agent.eval.run_ablation`（消融）；`python -m agent.eval.diagnose_stages`（逐条定位）
-- 证据：`phase3_report.md`（成绩表+消融+局限）、`phase3_traces.md`（10 条 trace）、`phase3loop.md`（迭代）
-- **F1（曲库外歌词拒答）已终结，带未达标项**：最终固化 `LYRIC_MIN_CONF=0.75` + `LYRIC_SOURCE_ENABLED=False`（「认出处」方案已实现，dev 成立、留出集失效故默认关闭）。固化数字 dev/留出集：点名 1.00、知名曲库外 0.70/0.70（线 0.90 ✗）、冷门 0.633/0.80、库内歌词 Hit@5 0.88/0.85（留出集线 0.88 ✗）、库内误认 0/0。**未达标项如实留档**，见 `phase3loop.md` 末节。
+- 证据：`phase3_report.md`（成绩表+消融+局限）、`phase3_traces.md`（10 条 trace）、`archive/phase3loop.md`（迭代）
+- **F1（曲库外歌词拒答）已终结，带未达标项**：最终固化 `LYRIC_MIN_CONF=0.75` + `LYRIC_SOURCE_ENABLED=False`（「认出处」方案已实现，dev 成立、留出集失效故默认关闭）。固化数字 dev/留出集：点名 1.00、知名曲库外 0.70/0.70（线 0.90 ✗）、冷门 0.633/0.80、库内歌词 Hit@5 0.88/0.85（留出集线 0.88 ✗）、库内误认 0/0。**未达标项如实留档**，见 `archive/phase3loop.md` 末节。
 
 ## 4. 多轮与记忆
 - 交付：`agent/core/{chat,session}.py`、`POST /agent/chat`
@@ -32,7 +32,7 @@
 ## 5. 接入 App
 - 交付：`openKoa/routes|controller`(`/agent/chat` SSE+JWT)、`myMusic/.../pages/AiSearch.ets`、`main_pages.json`、`Index.ets` 入口
 - 验证（后端已实测）：`uvicorn agent.app:app --port 8000` + `node openKoa/bin/www` → `login` → `POST /agent/chat`（SSE `status→result`）
-- **一键端到端验收**：`D:\apps\tools\Conda\python.exe -m agent.e2e_smoke` → **12/12 passed**（直连 `/agent/search`、登录 JWT、SSE、歌词会话多轮「换一首/更X一点/不要伤感」、拒答不回退）。两个服务要先起着。
+- **一键端到端验收**：`D:\apps\tools\Conda\python.exe -m agent.e2e_smoke` → **13/13 passed**（预热就绪、直连 `/agent/search`、登录 JWT、SSE、歌词会话多轮「换一首/更X一点/不要伤感」、同名异歌手拒答）。两个服务要先起着。
 - ⚠️ 客户端需 **DevEco Studio** 编译/真机验证（本环境无）
 - 证据：`phase5_report.md`
 
@@ -51,7 +51,7 @@ D:\apps\tools\Conda\python.exe -m uvicorn agent.app:app --port 8000
 # 3) Koa 后端
 node openKoa/bin/www            # :3000
 # 4) 一键端到端验收（两个服务都在跑时）
-D:\apps\tools\Conda\python.exe -m agent.e2e_smoke        # 期望 12/12 passed
+D:\apps\tools\Conda\python.exe -m agent.e2e_smoke        # 期望 13/13 passed
 # 5) 客户端：DevEco 打开 myMusic，装到设备/模拟器，首页点「AI 搜歌」
 ```
 

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>搜歌 Agent · 架构总图 v5</title>
+<style>
+  :root{
+    --ink:#151922; --mute:#6b7280; --faint:#9aa3b2;
+    --line:#e3e7ee; --bg:#eef1f5; --card:#fff;
+    --blue:#2f6df6; --blue-bg:#eef3ff; --blue-bd:#d8e3ff;
+    --purple:#7c4dff; --purple-bg:#f6f2ff; --purple-bd:#e3d8ff;
+    --green:#0f9d63; --green-bg:#e9faf2; --green-bd:#c9f0de;
+    --amber:#c27400; --amber-bg:#fff7e8; --amber-bd:#f6e2b8;
+    --red:#d94a5f; --red-bg:#fdeef1; --red-bd:#f6d0d7;
+    --gray:#64748b; --gray-bg:#f2f5f9; --gray-bd:#e0e6ee;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.5 "PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif}
+  .page{padding:28px 24px 40px;overflow-x:auto}
+  .board{position:relative;width:1440px;height:1520px;margin:0 auto;background:#fff;
+    border-radius:20px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 12px 40px rgba(16,24,40,.06)}
+  .stage{position:absolute;inset:0}
+
+  h1{position:absolute;left:40px;top:26px;margin:0;font-size:23px;letter-spacing:-.3px}
+  .sub{position:absolute;left:40px;top:60px;font-size:12.5px;color:var(--mute)}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .band{position:absolute;left:60px;top:470px;width:1320px;height:740px;
+    background:linear-gradient(180deg,#faf8ff,#f7f4ff);border:1px solid var(--purple-bd);
+    border-radius:18px;z-index:0}
+  .bandlab{position:absolute;left:24px;top:12px;font-size:9.5px;font-weight:700;
+    letter-spacing:.08em;color:var(--purple)}
+
+  .panel{position:absolute;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;z-index:1}
+  .panel.dashed{border-style:dashed;background:#fdfcff}
+  .ptitle{position:absolute;left:16px;top:12px;font-size:12.5px;font-weight:650;color:var(--ink)}
+  .psub{position:absolute;left:16px;top:30px;font-size:10.5px;color:var(--faint)}
+
+  .node{position:absolute;border-radius:11px;border:1px solid;padding:10px 12px;z-index:4}
+  .nt{font-size:13px;font-weight:650;letter-spacing:-.1px}
+  .nd{font-size:11px;color:var(--mute);margin-top:3px;line-height:1.5}
+  .mono{font-family:ui-monospace,Consolas,"Cascadia Mono",monospace}
+
+  .n-blue{background:var(--blue-bg);border-color:var(--blue-bd)}
+  .n-purple{background:#fff;border-color:var(--purple-bd);box-shadow:0 0 0 3px rgba(124,77,255,.06)}
+  .n-green{background:var(--green-bg);border-color:var(--green-bd)}
+  .n-amber{background:var(--amber-bg);border-color:var(--amber-bd)}
+  .n-red{background:var(--red-bg);border-color:var(--red-bd)}
+
+  .tbox{position:absolute;background:#fff;border:1px solid var(--amber-bd);border-radius:11px;
+    padding:8px 12px;z-index:4}
+  .tbox .tt{font-size:12px;font-weight:650}
+  .tbox .td{font-size:9px;color:var(--mute);line-height:1.45;margin-top:1px}
+  .target{border-style:dashed;background:#fffdf7}
+  .badge{display:inline-block;font-size:9px;font-weight:650;padding:0 5px;border-radius:20px;
+    background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);margin-left:5px}
+
+  .pill{position:absolute;border-radius:8px;border:1px solid;padding:7px 10px;z-index:4;
+    font-size:11px;line-height:1.35}
+  .pill .t{font-weight:650;font-size:11.5px}
+  .pill .d{color:var(--mute);font-size:10px}
+
+  .strip{position:absolute;border-radius:14px;border:1px solid var(--line);background:#fbfcfe;z-index:2}
+  .strip-amber{background:linear-gradient(180deg,#fffaf0,#fff7e8);border-color:var(--amber-bd)}
+  .strip-blue{background:#f8faff;border-color:var(--blue-bd)}
+  .strip-gray{background:#fbfcfe;border-color:var(--gray-bd)}
+  .strip.dashed{border-style:dashed}
+  .striplab{position:absolute;left:16px;top:9px;font-size:9px;font-weight:700;
+    letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+  .chain{position:absolute;display:flex;align-items:center;gap:7px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;
+    font-size:11px;text-align:center;line-height:1.3;flex:0 0 auto}
+  .chip b{display:block;font-size:11px;font-weight:650}
+  .chip span{color:var(--mute);font-size:9.5px}
+  .ar{color:#b6bfcc;font-size:11px}
+
+  .row{position:absolute;left:760px;width:576px;height:62px;background:#fff;
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px 8px 40px;z-index:4}
+  .row .idx{position:absolute;left:11px;top:18px;width:20px;height:20px;border-radius:6px;
+    background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber);
+    font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .row .rt{font-size:11.5px;font-weight:650}
+  .row .rd{font-size:10px;color:var(--mute);margin-top:1px;line-height:1.4}
+
+  .stop{position:absolute;left:410px;top:560px;width:250px;height:340px;background:#fff;
+    border:1px solid var(--red-bd);border-radius:12px;padding:12px 14px;z-index:4}
+  .stop .h{font-size:11.5px;font-weight:700;color:var(--red);letter-spacing:.02em}
+  .stop ul{margin:7px 0 0 14px;padding:0;font-size:10.5px;color:var(--mute);line-height:1.75}
+  .stop .foot{margin-top:7px;padding-top:6px;border-top:1px dashed var(--red-bd);
+    font-size:9px;color:var(--red);line-height:1.5}
+
+  svg.links{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:visible}
+  .ln{stroke:#a9b3c2;stroke-width:1.4;fill:none}
+  .dash{stroke-dasharray:4 4}
+  .lab{font:10px "PingFang SC","Microsoft YaHei",sans-serif;fill:#8b95a5;paint-order:stroke;
+    stroke:#fff;stroke-width:3px;stroke-linejoin:round}
+  .lab.s{font-size:9px}
+
+  .legend{position:absolute;left:60px;top:1478px;display:flex;gap:16px;font-size:10px;color:var(--mute);
+    flex-wrap:wrap;width:1320px}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .legend .sep{width:1px;height:12px;background:var(--line);margin:0 2px}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="board"><div class="stage">
+
+  <h1>搜歌 Agent · 架构总图 v5</h1>
+  <div class="sub">
+    <b>App → Koa → Turn → Router →（Fast Path | Agent Loop）→ 工具 → 确定性内核 → 数据</b>
+    　·　实线=已有，虚线=目标态；Router 默认 Agent，Fast 仅严格例外
+  </div>
+
+  <!-- ============ 连线 ============ -->
+  <svg class="links" width="1440" height="1520">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5"
+              orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#a9b3c2"/>
+      </marker>
+    </defs>
+
+    <!-- App <-> Koa -->
+    <path class="ln" d="M262,128 H348" marker-end="url(#ar)"/>
+    <path class="ln dash" d="M348,156 H268" marker-end="url(#ar)"/>
+
+    <!-- Koa -> Turn -->
+    <path class="ln" d="M484,180 V196" marker-end="url(#ar)"/>
+
+    <!-- Turn <-> 持久化 -->
+    <path class="ln dash" d="M476,254 H488" marker-start="url(#ar)" marker-end="url(#ar)"/>
+
+    <!-- Turn -> Router -->
+    <path class="ln" d="M440,310 V342" marker-end="url(#ar)"/>
+
+    <!-- Router -> Fast Path -->
+    <path class="ln" d="M360,385 H304" marker-end="url(#ar)"/>
+
+    <!-- Router -> Agent Loop -->
+    <path class="ln" d="M460,424 V506" marker-end="url(#ar)"/>
+
+    <!-- Fast Path 旁路 -> search_songs -->
+    <path class="ln dash" d="M76,385 H44 V1052 H84" marker-end="url(#ar)"/>
+
+    <!-- LLM -> 工具执行 -->
+    <path class="ln" d="M245,672 V796" marker-end="url(#ar)"/>
+
+    <!-- 工具执行 -> LLM（回环） -->
+    <path class="ln" d="M120,850 H104 V616 H114" marker-end="url(#ar)"/>
+
+    <!-- 护栏 -> LLM（复核失败，最多 1 次） -->
+    <path class="ln dash" d="M410,580 H376" marker-end="url(#ar)"/>
+
+    <!-- 工具执行 -> 工具扇出 -->
+    <path class="ln" d="M245,900 V950"/>
+    <path class="ln" d="M169,950 H1249"/>
+    <path class="ln" d="M169,950 V986" marker-end="url(#ar)"/>
+    <path class="ln" d="M349,950 V986" marker-end="url(#ar)"/>
+    <path class="ln" d="M529,950 V986" marker-end="url(#ar)"/>
+    <path class="ln" d="M709,950 V986" marker-end="url(#ar)"/>
+    <path class="ln" d="M889,950 V986" marker-end="url(#ar)"/>
+    <path class="ln" d="M1069,950 V986" marker-end="url(#ar)"/>
+    <path class="ln" d="M1249,950 V986" marker-end="url(#ar)"/>
+
+    <!-- Loop <-> Context -->
+    <path class="ln" d="M684,640 H740" marker-start="url(#ar)" marker-end="url(#ar)"/>
+
+    <!-- search_songs -> 检索内核 -->
+    <path class="ln" d="M169,1114 V1236" marker-end="url(#ar)"/>
+
+    <!-- 检索内核 -> 数据 -->
+    <path class="ln" d="M820,1284 H856" marker-end="url(#ar)"/>
+
+    <!-- 结果回 Koa -->
+    <path class="ln dash" d="M1334,1052 H1416 V150 H616" marker-end="url(#ar)"/>
+
+    <!-- trace -> 评测 -->
+    <path class="ln dash" d="M1380,1210 H1392 V1356 H1384" marker-end="url(#ar)"/>
+
+    <!-- 标签 -->
+    <text class="lab" x="305" y="120" text-anchor="middle">POST /agent/chat</text>
+    <text class="lab" x="308" y="170" text-anchor="middle">SSE 回传</text>
+    <text class="lab" x="492" y="192">HTTP</text>
+    <text class="lab s" x="446" y="330">dispatch</text>
+    <text class="lab s" x="332" y="377" text-anchor="middle">fast</text>
+    <text class="lab s" x="470" y="462">agent</text>
+    <text class="lab" x="256" y="730">tool_calls</text>
+    <text class="lab" x="96" y="730" text-anchor="middle" transform="rotate(-90 96 730)">tool_result</text>
+    <text class="lab" x="712" y="632" text-anchor="middle">上下文</text>
+    <text class="lab" x="256" y="934">registry.run(name, args)</text>
+    <text class="lab" x="36" y="700" text-anchor="middle" transform="rotate(-90 36 700)">fast path · 免 LLM</text>
+    <text class="lab" x="1000" y="142" text-anchor="middle">SSE result（含 degraded）</text>
+    <text class="lab" x="1402" y="1290" text-anchor="middle" transform="rotate(-90 1402 1290)">trace 收集（目标）</text>
+  </svg>
+
+  <!-- ============ 接入层 ============ -->
+  <div class="node n-blue" style="left:60px;top:96px;width:200px;height:84px">
+    <div class="nt">鸿蒙 App</div>
+    <div class="nd">AiSearch.ets<br>requestInStream · 渲染 SSE · abort</div>
+  </div>
+
+  <div class="node n-blue" style="left:356px;top:96px;width:256px;height:84px">
+    <div class="nt">Koa :3000</div>
+    <div class="nd" style="font-size:10px">agentChat · verifyToken（JWT）<br>→ :8000 X-Agent-Key · loopback<br>现状 2+1；目标每步 emit/abort；200 必发 result</div>
+  </div>
+
+  <!-- ============ Turn 层 ============ -->
+  <div class="strip strip-amber" style="left:60px;top:200px;width:1320px;height:110px"></div>
+
+  <div class="tbox" style="left:76px;top:206px;width:400px;height:96px">
+    <div class="tt">Turn 入口</div>
+    <div class="td">turn_id<span class="badge">待建</span> · session_id · key = {uid}:{sessionId}</div>
+    <div class="td">dispatch: answer / select / new / more / refine / negative</div>
+    <div class="td">无历史：more / refine / negative → 降级 new；幂等 turn_id</div>
+    <div class="td">finally 写回 state —— Fast / Agent / 失败回合都覆盖</div>
+  </div>
+
+  <div class="tbox target" style="left:492px;top:206px;width:190px;height:96px">
+    <div class="tt">持久化<span class="badge">待建</span></div>
+    <div class="td">state{intent, seen, pending, last_search}</div>
+    <div class="td">SQLite / Redis；现为内存 TTL 30min</div>
+    <div class="td">per-session 锁</div>
+  </div>
+
+  <div class="tbox" style="left:698px;top:206px;width:666px;height:96px">
+    <div class="tt">回合规则</div>
+    <div class="td">pending_question 非空 → dispatch = answer；pending = {turn_id, slot, question, options}</div>
+    <div class="td">answer / more / refine / negative 强制进 Agent；只有 new 交给 Router</div>
+    <div class="td">select → last_shown；长期偏好 → exclude_tags / 降权</div>
+    <div class="td">X-Agent-Key 覆盖 /agent/* + /tool/*；pending 超 3 轮作废</div>
+  </div>
+
+  <!-- ============ Router 层 ============ -->
+  <div class="strip strip-blue dashed" style="left:60px;top:340px;width:1320px;height:90px"></div>
+
+  <div class="node n-blue" style="left:76px;top:346px;width:224px;height:78px">
+    <div class="nt">Fast Path <span class="badge">接入待建</span></div>
+    <div class="nd" style="font-size:9.5px">复用 fast_path() · 严格例外：<br>turn0 ∧ 无 pending ∧ 无历史 ∧ 精确命中<br>∧ 非风格引用 ∧ dispatch=new</div>
+  </div>
+
+  <div class="node n-blue" style="left:360px;top:346px;width:200px;height:78px">
+    <div class="nt">Router · 默认 Agent</div>
+    <div class="nd" style="font-size:9.5px">answer / more / refine / negative → Agent（强制）<br>new → Fast 仅严格例外<br>trace route / route_reason</div>
+  </div>
+
+  <div class="tbox" style="left:600px;top:346px;width:764px;height:78px;background:#f8faff;border-color:var(--blue-bd)">
+    <div class="tt">分支契约</div>
+    <div class="td">Fast：单次 search_songs → finish(source=template)，reason = 歌名 · 歌手；不读 state</div>
+    <div class="td">Agent：可多工具、可澄清、可续轮；结果仍走同一套 finish 白名单</div>
+    <div class="td">F2「像 X 那样的歌」必须在 Router 之前判定，不能进 Fast</div>
+  </div>
+
+  <!-- ============ Agent 区 ============ -->
+  <div class="band">
+    <div class="bandlab">AGENT SERVICE · FASTAPI :8000　目标态：Agent Loop / Context / Router / 工具面待建；底层 8 工具与五步管线已有</div>
+  </div>
+
+  <!-- Agent Loop 面板 -->
+  <div class="panel dashed" style="left:84px;top:510px;width:600px;height:430px">
+    <div class="ptitle">Agent Loop <span class="badge">待建</span></div>
+  </div>
+
+  <div class="node n-purple" style="left:120px;top:560px;width:250px;height:112px">
+    <div class="nt">LLM · DeepSeek</div>
+    <div class="nd">tool calling<br>每轮决定：调哪个工具 / 何时收尾<br>产出结构化参数，不产出歌曲</div>
+  </div>
+
+  <div class="node n-green" style="left:120px;top:800px;width:250px;height:100px">
+    <div class="nt">工具执行 · registry.run()</div>
+    <div class="nd">Pydantic 校验 · 20s 超时 · 每步查 cancel<br>结果写回上下文 · 记录 trace</div>
+  </div>
+
+  <div class="stop">
+    <div class="h">护栏 / 停止条件</div>
+    <ul>
+      <li>调用 <b>finish</b></li>
+      <li>steps ≥ 5</li>
+      <li>searches ≥ 2</li>
+      <li>deadline 45s（Koa 60s）</li>
+      <li>tokens ≥ 20k</li>
+      <li>同一工具连续失败 2 次</li>
+    </ul>
+    <div class="foot">复核失败 → 回 LLM ≤1 次<br>触顶 / 取消 → degraded{reasons, at_step, partial}，返回 partial<br>0 候选 → 友好拒答，不返回空列表</div>
+  </div>
+
+  <!-- Context 面板 -->
+  <div class="panel dashed" style="left:744px;top:510px;width:608px;height:430px">
+    <div class="ptitle">Context · 每轮重新组装 <span class="badge">待建</span></div>
+    <div class="psub">总量受控：压缩 + 外置，不靠更大窗口</div>
+  </div>
+
+  <div class="row" style="top:560px">
+    <div class="idx">1</div>
+    <div class="rt">system prompt</div>
+    <div class="rd">角色 · 工具使用策略 · 输出约束（约 300 字，保持薄）</div>
+  </div>
+  <div class="row" style="top:630px">
+    <div class="idx">2</div>
+    <div class="rt">Skills · 可选（v1 不启用）</div>
+    <div class="rd">单场景不加载 SKILL.md；保留扩展位</div>
+  </div>
+  <div class="row" style="top:700px">
+    <div class="idx">3</div>
+    <div class="rt">session.state · 结构化工作记忆</div>
+    <div class="rd">目标 · 约束 · 拒绝标签 · seen · last_shown · last_search · pending_question</div>
+  </div>
+  <div class="row" style="top:770px">
+    <div class="idx">4</div>
+    <div class="rt">messages · 最近 N 轮原文</div>
+    <div class="rd">超 8 轮或 12k token 时摘要进 state；摘要调用的 ms/tokens 计入预算</div>
+  </div>
+  <div class="row" style="top:840px">
+    <div class="idx">5</div>
+    <div class="rt">candidates · 候选池（LRU 60）</div>
+    <div class="rd">不进上下文；refine_candidates 只读 state.last_search，不靠模型记 id</div>
+  </div>
+
+  <!-- 输出护栏 -->
+  <div class="pill n-red" style="left:744px;top:1144px;width:610px;height:44px">
+    <div class="t">输出护栏：finish id ⊆ 工具返回 id + db.filter_songs 复核</div>
+    <div class="d">degraded → Koa result（error 仅传输）；工具输出 ≤120字/条 · ≤4k/次 · 包成数据</div>
+  </div>
+
+  <!-- ============ 工具层（目标接口） ============ -->
+  <div class="strip dashed" style="left:60px;top:960px;width:1294px;height:170px">
+    <div class="striplab" style="left:16px;top:156px;letter-spacing:.04em;text-transform:none">
+      目标工具面 · 底层 registry 的 8 个只读工具已有，下面是对 agent 暴露的 7 个接口
+    </div>
+  </div>
+
+  <div class="node n-green" style="left:84px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#0b7d4f;font-size:12px">search_songs</div>
+    <div class="nd mono" style="font-size:9px">query · mode · filters<br>exclude_tags · limit</div>
+    <div class="nd" style="font-size:9.5px">30 卡片 + facets + exhausted</div>
+    <div class="nd" style="font-size:9px">负偏好 → 降权 / 排除</div>
+  </div>
+
+  <div class="node n-green" style="left:264px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#0b7d4f;font-size:12px">refine_candidates</div>
+    <div class="nd mono" style="font-size:9px">drop_tags · keep_tags<br>drop_song_ids</div>
+    <div class="nd" style="font-size:9.5px">只吃 state.last_search · LRU 60</div>
+  </div>
+
+  <div class="node n-green" style="left:444px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#0b7d4f;font-size:12px">get_song_detail</div>
+    <div class="nd mono" style="font-size:9px">song_id</div>
+    <div class="nd" style="font-size:9.5px">时长 · 语种 · 标签（不含歌词）</div>
+  </div>
+
+  <div class="node n-amber" style="left:624px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#a05f00;font-size:12px">ask_user</div>
+    <div class="nd mono" style="font-size:9px">question · options · slot</div>
+    <div class="nd" style="font-size:9.5px">写 pending_question，结束本轮</div>
+  </div>
+
+  <div class="node n-amber" style="left:804px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#a05f00;font-size:12px">get_user_profile</div>
+    <div class="nd mono" style="font-size:9px">limit</div>
+    <div class="nd" style="font-size:9.5px">显式偏好 + 隐式画像（正/负）· uid 注入</div>
+  </div>
+
+  <div class="node n-amber" style="left:984px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#a05f00;font-size:12px">remember_preference</div>
+    <div class="nd mono" style="font-size:9px">tag · polarity</div>
+    <div class="nd" style="font-size:9px">user_preference(uid, tag, ±, ≤0.3, 30d)</div>
+    <div class="nd" style="font-size:9px">search_songs 内部乘分；反向覆盖</div>
+  </div>
+
+  <div class="node n-red" style="left:1164px;top:990px;width:170px;height:124px">
+    <div class="nt mono" style="color:#b23a4d;font-size:12px">finish</div>
+    <div class="nd mono" style="font-size:9px">song_ids · reasons<br>message · source</div>
+    <div class="nd" style="font-size:9.5px">id 白名单 + 约束复核；source=llm/template</div>
+  </div>
+
+  <!-- ============ 检索内核 ============ -->
+  <div class="strip" style="left:60px;top:1240px;width:760px;height:88px">
+    <div class="striplab">search_songs 内部 · 原确定性五步（已有）</div>
+    <div class="chain" style="left:16px;top:38px">
+      <div class="chip"><b>recall</b><span>四路召回</span></div>
+      <span class="ar">→</span>
+      <div class="chip"><b>rank</b><span>RRF + 重排</span></div>
+      <span class="ar">→</span>
+      <div class="chip"><b>verify</b><span>阈值 / 拒答</span></div>
+      <span class="ar">→</span>
+      <div class="chip"><b>exclude</b><span>标签 / id 减法</span></div>
+      <span class="ar">→</span>
+      <div class="chip"><b>cards + facets</b><span>组装返回</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 数据层 ============ -->
+  <div class="strip" style="left:860px;top:1240px;width:520px;height:88px">
+    <div class="striplab">数据与模型（进程外）</div>
+    <div class="chain" style="left:16px;top:38px">
+      <div class="chip" style="width:150px"><b>MySQL · mymusic</b><span>歌曲 / 标签 / 歌词 / 播放</span></div>
+      <div class="chip" style="width:150px"><b>向量索引</b><span>bge-m3 · songs_v1</span></div>
+      <div class="chip" style="width:150px"><b>Reranker</b><span>bge-reranker-v2-m3</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 评测与观测 ============ -->
+  <div class="strip strip-gray dashed" style="left:60px;top:1360px;width:1320px;height:92px">
+    <div class="striplab">评测与观测 · 目标态（待建）</div>
+    <div class="chain" style="left:16px;top:32px">
+      <div class="chip" style="width:300px"><b>多轮 golden 30 条（待建）</b><span>来源：线上失败 + 人工标注 5 类</span></div>
+      <span class="ar">→</span>
+      <div class="chip" style="width:300px"><b>任务成功 = 5 条断言</b><span>约束 · seen · 槽位 · 必/禁调工具 · 合法 id</span></div>
+      <span class="ar">→</span>
+      <div class="chip" style="width:300px"><b>基线 = 现 chat() + classify_turn</b><span>同集跑；成功率 ≥ 基线 +10%</span></div>
+      <span class="ar">→</span>
+      <div class="chip" style="width:300px"><b>trace + 阈值</b><span>P95 ≤6s · tokens/turn ≤8k</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 图例 ============ -->
+  <div class="legend">
+    <span><i style="background:var(--blue)"></i>接入 / 路由</span>
+    <span><i style="background:var(--purple)"></i>Agent 循环</span>
+    <span><i style="background:var(--amber)"></i>Turn / 记忆</span>
+    <span><i style="background:var(--green)"></i>检索类工具</span>
+    <span><i style="background:var(--red)"></i>收尾 / 护栏</span>
+    <span><i style="background:var(--gray)"></i>数据 / 评测</span>
+    <span class="sep"></span>
+    <span>实线 = 已有能力　虚线 = 目标态 / 待建</span>
+  </div>
+
+</div></div>
+</div>
+</body>
+</html>

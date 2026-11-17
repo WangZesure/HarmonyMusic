@@ -1,6 +1,6 @@
 # 阶段 1 & 2 实现与测试报告
 
-> 生成日期 2026-10-12 · 对应 `phase12.md`（阶段1、2）与 `contracts_v1.md`(C1–C8)、`between12.md`(数据库)。
+> 生成日期 2026-10-12 · 对应 `archive/phase12.md`（阶段1、2）与 `contracts_v1.md`(C1–C8)、`archive/between12.md`(数据库)。
 > 运行环境：本机 MySQL 8.0.19(`mymusic`) + `D:\apps\tools\Conda\python.exe`(3.13，含 torch/sentence-transformers)；
 > 数据流水线在 `D:\1Projects\HarmonyMusic\data_pipeline/`，Agent 工具层在 `agent/`。
 

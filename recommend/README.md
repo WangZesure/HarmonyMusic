@@ -1,305 +1,108 @@
-# MyMusic推荐系统
+# 推荐系统
 
-基于双塔神经网络的音乐推荐系统，支持个性化推荐和实时预测。
+**当前版本：v2 · 内容双塔（PyTorch）**。完整实验记录见 [`REPORT_v2.md`](REPORT_v2.md)，可视化讲解见 [`recsys.html`](recsys.html)。
 
-## 功能特性
+> v1（TensorFlow ID 双塔）已废弃，代码留在 `src/` 仅作历史参考。原因见 `REPORT_v2.md §1`。
 
-- 🎵 双塔神经网络架构（用户塔LSTM + 歌曲塔Dense）
-- 📊 支持mymusic数据库集成
-- 🔮 实时推荐预测
-- 🌐 JSON API接口
-- 💾 模型持久化存储
+---
 
-## 环境要求
+## 它做什么
 
-- Python 3.8+
-- MySQL 5.7+
-- 操作系统：Windows/Linux/macOS
+给一个用户，从 500 首曲库里排出他可能喜欢的歌。两种路径，**响应里会明确标注用了哪条**：
 
-## 快速开始
+| 情况 | 算法 | `algorithm` 字段 |
+|---|---|---|
+| 用户有播放记录 | 内容双塔个性化 | `two-tower-v2` |
+| 用户没有播放记录 | 热门兜底 | `popularity` |
 
-### 1. 项目完整性检查
+不会把兜底伪装成个性化。
 
-首先检查项目文件完整性：
+## 模型
+
+```
+歌曲塔： bge-m3 向量(1024, 冻结) → Linear(256) → ReLU → Dropout → Linear(64) → L2
+用户塔： 历史歌曲向量的完成率加权平均(1024) → 同上 → L2
+打分：   5 × cos(user, song)  →  BCEWithLogitsLoss
+```
+
+**没有 ID embedding**，所以：
+
+- 新歌入库就有向量（来自文本卡片），冷启动天然可解；
+- 新用户听几首就能被服务；
+- 直接复用 `data_pipeline` 建好的 `songs_v1` 索引（500×1024）。
+
+## 目录
+
+```
+recsys/
+├── config.py     超参与路径（全部可用环境变量覆盖）
+├── data.py       曲库/标签/向量加载、合成播放生成、入库
+├── features.py   完成率加权的历史向量（训练/评测/推理共用，必须一致）
+├── model.py      内容双塔
+├── train.py      训练
+├── evaluate.py   留一法 + 口味级 + 三个基线
+├── generate.py   生成合成播放数据
+└── serve.py      推理入口（Koa 调用）
+
+artifacts/
+├── two_tower_v2.pt          模型权重（gitignored，可重建）
+├── meta_v2.json             训练元信息 + loss 曲线
+├── eval_v2.json             完整评测结果
+└── synthetic_profiles.json  合成用户的真实偏好（仅评测用）
+
+src/                         ← v1 遗留（TF），不再使用
+scripts/api/simple_recommend.py   ← Koa 的调用入口（已改为调 recsys.serve）
+```
+
+## 运行
 
 ```bash
-# 检查系统状态
-python main.py check
+cd recommend
+PY="D:/apps/tools/Conda/python.exe"     # 需要 torch
+
+$PY -m recsys.generate    # 生成 200 用户 × 15 条播放，写入 user_plays
+$PY -m recsys.train       # 训练 → artifacts/two_tower_v2.pt
+$PY -m recsys.evaluate    # 留一法 + 口味级评测 → artifacts/eval_v2.json
+
+# 单用户推理
+$PY scripts/api/simple_recommend.py 100000 6
 ```
 
-预期输出应该显示：
-- ✅ 数据目录、SQL脚本目录、模型目录存在
-- ✅ 消费者数据和播放记录数据完整
-- ✅ 训练模型和映射文件存在
-- 📊 数据库连接状态
+环境变量：`REC_SEED` / `REC_N_USERS` / `REC_PLAYS_PER_USER` / `REC_EXPLORE_RATE` / `REC_EPOCHS`。
 
-### 2. 环境配置
+## 评测结果（留一法，200 用户 / 500 首）
 
-安装Python依赖：
+| 方法 | Hit@10 | Hit@50 | NDCG@10 |
+|---|---|---|---|
+| **model** | 0.055 | **0.315** | 0.027 |
+| tag-match | **0.065** | 0.170 | **0.031** |
+| popularity | 0.045 | 0.180 | 0.020 |
+| random | 0.005 | 0.100 | 0.002 |
 
-```bash
-pip install -r requirements.txt
-```
+模型明显优于热门和随机；**tag-match 在口味级指标上更强**——因为口味级相关集就是按标签重叠定义的，
+标签启发式等于直接优化该指标。这个结论没有粉饰，详见 `REPORT_v2.md §5.3`。
 
-依赖包列表：
-- tensorflow==2.15.0
-- numpy==1.24.3
-- pandas==2.0.3
-- scikit-learn==1.3.0
-- pymysql==1.1.0
-
-### 3. 数据库初始化
-
-⚠️ **重要：如果你的本地数据库还是未修改的原始版本，需要执行以下步骤**
-
-#### 3.1 确认数据库状态
-```bash
-# 检查当前数据库状态
-python main.py check
-```
-
-如果显示数据库连接失败或表不存在，需要初始化数据库。
-
-#### 3.2 创建数据库（如果不存在）
-```sql
--- 连接MySQL并创建数据库
-CREATE DATABASE IF NOT EXISTS mymusic;
-USE mymusic;
-```
-
-#### 3.3 执行数据初始化脚本
-
-**方法一：使用MySQL命令行**
-```bash
-# 进入MySQL命令行
-mysql -u root -p
-
-# 选择数据库
-USE mymusic;
-
-# 执行消费者数据脚本
-SOURCE sql_scripts/mymusic/insert_consumers.sql;
-
-# 执行播放记录脚本（包含表创建）
-SOURCE sql_scripts/mymusic/create_and_insert_user_plays.sql;
-```
-
-#### 3.4 验证数据库初始化
-```bash
-python main.py check
-```
-
-应该显示：
-- ✅ consumers: 102 条记录
-- ✅ songs: 10 条记录  
-- ✅ singers: 6 条记录
-- ✅ user_plays: 5000 条记录
-
-### 4. 模型训练（可选）
-
-如果需要重新训练模型：
-
-```bash
-python main.py train
-```
-
-训练完成后会显示：
-- 模型准确率（预期：~81%）
-- 模型保存路径：models/mymusic_twin_tower.keras
-
-### 5. 生成推荐
-
-#### 5.1 命令行推荐
-```bash
-# 生成推荐示例
-python main.py predict
-```
-
-#### 5.2 API接口调用
-```bash
-# 为用户3推荐5首歌曲
-python scripts/api/simple_recommend.py 3 5
-
-# 为用户10推荐3首歌曲  
-python scripts/api/simple_recommend.py 10 3
-```
-
-## 项目结构
+## 与 Koa 的集成
 
 ```
-recommend/
-├── main.py                 # 主程序入口
-├── requirements.txt        # 依赖包
-├── README.md              # 项目文档
-├── models/                # 训练好的模型
-│   └── mymusic_twin_tower.keras
-├── data/                  # 数据文件
-│   ├── mymusic_generated/ # 生成的数据
-│   └── mymusic_processed/ # 处理后的数据
-├── src/                   # 核心源码
-│   ├── mymusic_config.py  # 配置文件
-│   ├── train_mymusic.py   # 模型训练
-│   └── predict_mymusic.py # 推荐预测
-├── scripts/               # 工具脚本
-│   ├── api/              # API接口
-│   │   └── simple_recommend.py
-│   ├── data_generation/  # 数据生成
-│   └── tools/           # 工具脚本
-└── sql_scripts/          # SQL脚本
-    └── mymusic/         # mymusic数据库脚本
+Koa /getRecommendSongs?userId=&count=
+  └─ exec("$RECOMMEND_PYTHON scripts/api/simple_recommend.py <userId> <count>")
+       └─ recsys.serve.recommend()  →  {"success": true, "algorithm": ..., "recommendations": [...]}
 ```
 
-## 数据库结构
+- **解释器**：脚本需要 torch，系统 python 没有。在 `.env` 里设
+  `RECOMMEND_PYTHON=D:\apps\tools\Conda\python.exe`。
+- **缓存**：脚本每次 `import torch` 约 5s，Koa 侧对推荐结果做了 10 分钟 TTL 缓存
+  （`REC_CACHE_MS` 可调，设 0 关闭）。冷启动 5.5s → 命中缓存 5ms。
+- **Koa 侧返回**：`meta.algorithm` / `meta.reason` 会透出，热门兜底时 `reason` 写「热门推荐」而不是匹配度。
 
-### 主要相关表结构：
+## 历史版本（v1，已废弃）
 
-1. **consumers** - 用户表
-   - 字段：id, username, sex, pic, birth, introduction, location, avator
-   - 数据：102个用户（ID: 3-102）
+基于 TensorFlow 的 ID 双塔，`src/train_mymusic.py` / `src/predict_mymusic.py` 仍在仓库里，但：
 
-2. **songs** - 歌曲表  
-   - 字段：id, singer_id, name, introduction, create_time, update_time, pic, lyric, url
-   - 数据：10首歌曲
+- 训练数据是「100 用户 × **10 首歌**」，那 10 首是旧 demo 曲库的 ID，与现在 500 首对不上；
+- 用户/歌曲都是 ID embedding，冷启动无解；
+- 未使用 bge-m3 向量；
+- 评测只在随机负样本上算 accuracy，没有意义。
 
-3. **singers** - 歌手表
-   - 字段：id, name, sex, pic, birth, location, introduction
-   - 数据：6位歌手
-
-4. **user_plays** - 播放记录表（新增）
-   - 字段：user_id, song_id, play_count, last_play_time
-   - 数据：5000条播放记录
-
-## API接口
-
-### 推荐API
-
-**调用方式：**
-```bash
-python scripts/api/simple_recommend.py [用户ID] [推荐数量]
-```
-
-**返回格式：**
-```json
-{
-    "success": true,
-    "user_id": "3",
-    "recommendations": [
-        {
-            "song_id": 5,
-            "score": 0.513,
-            "song_info": null
-        },
-        {
-            "song_id": 2,
-            "score": 0.457,
-            "song_info": null
-        }
-    ],
-    "count": 5
-}
-```
-
-## 集成到现有项目
-
-### 后端集成（Koa.js）
-
-在你的Koa.js项目中添加推荐接口：
-
-```javascript
-// 在controller/api.js中添加
-async getRecommendations(ctx) {
-    const { userId, count = 5 } = ctx.request.query;
-    
-    try {
-        const { exec } = require('child_process');
-        const result = await new Promise((resolve, reject) => {
-            exec(`python ../recommend/scripts/api/simple_recommend.py ${userId} ${count}`, 
-                (error, stdout, stderr) => {
-                if (error) reject(error);
-                else resolve(JSON.parse(stdout));
-            });
-        });
-        
-        ctx.body = {
-            code: 200,
-            message: '获取推荐成功',
-            data: result
-        };
-    } catch (error) {
-        ctx.body = {
-            code: 500,
-            message: '推荐系统错误',
-            error: error.message
-        };
-    }
-}
-```
-
-### 前端集成（HarmonyOS）
-
-在HarmonyOS应用中调用推荐API：
-
-```typescript
-// 推荐服务类
-class RecommendationService {
-    async getRecommendations(userId: number, count: number = 5): Promise<any> {
-        try {
-            const response = await this.httpUtil.request({
-                method: 'GET',
-                url: `${this.serverConfig.baseUrl}/api/recommendations`,
-                params: { userId, count }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('获取推荐失败:', error);
-            return [];
-        }
-    }
-}
-```
-
-## 性能指标
-
-- **训练准确率**：81.26%
-- **嵌入维度**：64
-- **推荐延迟**：<3秒
-- **数据规模**：100用户 + 10歌曲 + 5000播放记录
-- **模型大小**：~2MB
-
-## 故障排除
-
-### 常见问题
-
-1. **数据库连接失败**
-   ```
-   ⚠️ 数据库连接检查失败: No module named 'mysql'
-   ```
-   **解决方案**：安装PyMySQL
-   ```bash
-   pip install pymysql
-   ```
-
-2. **模型文件不存在**
-   ```
-   模型文件不存在: models/mymusic_twin_tower.keras
-   ```
-   **解决方案**：重新训练模型
-   ```bash
-   python main.py train
-   ```
-
-3. **映射文件缺失**
-   ```
-   映射文件不存在: data/mymusic_processed/mappings.npy
-   ```
-   **解决方案**：重新训练模型会自动生成映射文件
-
-4. **用户ID不存在**
-   ```
-   用户 user_999 不在映射中
-   ```
-   **解决方案**：使用有效的用户ID范围（3-102）
-
-## 许可证
-
-MIT License
+旧的集成改动清单在 [`archive/CHANGES.md`](archive/CHANGES.md)。

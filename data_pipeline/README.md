@@ -1,7 +1,7 @@
 # data_pipeline — 阶段 1 数据底座
 
 Builds the 500-track corpus + vector index that the song-search Agent runs on.
-Design lives in `DocsForMusicAgent/phase12.md`; this folder implements §1.1–1.7.
+Design lives in `DocsForMusicAgent/archive/phase12.md`; this folder implements §1.1–1.7.
 
 Scripts are run in numeric order and are resumable — each reads only the
 previous step's output from disk, so any step can be rerun on its own.

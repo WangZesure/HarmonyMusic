@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>推荐系统 v2 · 数据与模型</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#e2e6ec; --ink:#151922; --mute:#5d6675;
+    --blue:#2f6df6; --blue-bg:#eef3ff;
+    --green:#12a06a; --green-bg:#eafaf3;
+    --purple:#7c4dff; --purple-bg:#f3eeff;
+    --amber:#d98300; --amber-bg:#fff6e6;
+    --code-bg:#0f1117; --code-ink:#d8dee9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.65 "PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 28px 90px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:36px}
+  h2{font-size:20px;margin:56px 0 18px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+  h2 .n{display:inline-block;background:var(--ink);color:#fff;border-radius:6px;
+        font-size:12px;padding:2px 9px;margin-right:10px;vertical-align:2px;font-weight:600}
+  h3{font-size:14px;margin:26px 0 10px;color:var(--mute);font-weight:600;letter-spacing:.04em}
+
+  code,.mono{font-family:ui-monospace,Consolas,"Cascadia Mono",monospace}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 16px;
+      overflow-x:auto;font-size:12.5px;line-height:1.62;margin:10px 0}
+  pre .k{color:#88c0d0} pre .s{color:#a3be8c} pre .n{color:#d08770} pre .c{color:#616e88}
+
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .box .t{font-weight:650;font-size:15px}
+  .box .d{font-size:12.5px;color:var(--mute);margin-top:3px}
+  .bd{border-left:4px solid var(--line)}
+  .b-blue{border-left-color:var(--blue);background:var(--blue-bg)}
+  .b-pur{border-left-color:var(--purple);background:var(--purple-bg)}
+  .b-green{border-left-color:var(--green);background:var(--green-bg)}
+  .b-amber{border-left-color:var(--amber);background:var(--amber-bg)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  /* 形状徽标 */
+  .shape{display:inline-block;font-family:ui-monospace,Consolas,monospace;font-size:11px;
+         padding:1px 8px;border-radius:5px;background:#eef1f6;color:#4a5568;font-weight:600}
+  .shape.p{background:var(--purple-bg);color:var(--purple)}
+  .shape.b{background:var(--blue-bg);color:var(--blue)}
+  .shape.g{background:var(--green-bg);color:var(--green)}
+
+  /* 流程 */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .fstep{flex:1;min-width:150px;background:var(--card);border:1px solid var(--line);
+         border-radius:10px;padding:12px 14px;text-align:center}
+  .fstep .ft{font-size:11px;color:var(--mute);letter-spacing:.05em;margin-bottom:5px}
+  .fstep .fv{font-size:13px;font-weight:600}
+  .fstep .fs{margin-top:7px}
+  .farrow{display:flex;align-items:center;justify-content:center;width:38px;
+          color:#b6bfcc;font-size:18px;flex:0 0 auto}
+
+  /* 索引文件树 */
+  .tree{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 18px;
+        font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.75;
+        white-space:pre;overflow-x:auto}
+  .tree .dir{color:#88c0d0}
+  .tree .f{color:#d8dee9}
+  .tree .sz{color:#616e88}
+  .tree .hl{color:#a3be8c}
+
+  /* 表结构 */
+  .ddl{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 18px;
+       font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.7;
+       overflow-x:auto;white-space:pre}
+  .ddl .tbl{color:#88c0d0;font-weight:700}
+  .ddl .col{color:#d8dee9}
+  .ddl .ty{color:#b48ead}
+  .ddl .cm{color:#616e88}
+  .ddl .pk{color:#ebcb8b}
+
+  /* 双塔 */
+  .tt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .towers{display:grid;grid-template-columns:1fr 1fr;gap:52px}
+  .tower{border:1px dashed var(--line);border-radius:12px;padding:4px 16px 16px}
+  .tower.purple{border-color:#d9cdf5;background:#fbf9ff}
+  .tower.blue{border-color:#cddcfb;background:#f9fbff}
+  .tower .th{font-weight:700;font-size:14px;margin-bottom:14px;display:flex;
+             align-items:center;gap:8px;justify-content:center}
+  .tg{font-size:11px;font-weight:650;padding:2px 9px;border-radius:20px}
+  .tg-b{background:var(--blue-bg);color:var(--blue)}
+  .tg-p{background:var(--purple-bg);color:var(--purple)}
+
+  .layer{display:flex;align-items:center;justify-content:space-between;gap:10px;
+         background:#fff;border:1px solid var(--line);border-radius:8px;
+         padding:9px 12px;margin-bottom:6px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  .layer .ln{font-weight:600}
+  .layer.hl{border-color:#c9b8f0;background:#f6f2ff}
+  .down{text-align:center;color:#b6bfcc;font-size:12px;height:14px;line-height:14px}
+  .fan{display:flex;justify-content:space-around;color:#c9d0da;font-size:22px;margin:10px 0 4px}
+  .out{display:flex;justify-content:center;margin-top:6px}
+  .outbox{background:#fff;border:2px solid var(--purple);border-radius:10px;padding:11px 24px;
+          font-family:ui-monospace,Consolas,monospace;font-size:13px;font-weight:600;color:var(--purple)}
+
+  table.plain{width:100%;border-collapse:collapse;background:var(--card);
+              border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+  table.plain th{background:#f2f4f7;text-align:left;padding:9px 12px;font-size:12px;
+                 color:var(--mute);letter-spacing:.03em;font-weight:650}
+  table.plain td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+  table.plain td.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+
+  .note{margin-top:12px;font-size:12.5px;color:var(--mute);padding-left:11px;border-left:2px solid var(--line)}
+  .callout{background:#fffdf5;border:1px solid #f0e0b8;border-left:4px solid var(--amber);
+           border-radius:10px;padding:13px 16px;font-size:13px;margin-top:14px}
+  .callout b{color:#a86500}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--mute)}
+  @media print{body{background:#fff}.wrap{padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>推荐系统 v2 · 数据与模型</h1>
+  <div class="sub">两条数据线 → 一个双塔。所有形状与真实表结构均取自当前工程。</div>
+
+  <!-- ==================================================== 01 数据 -->
+  <h2><span class="n">01</span>数据</h2>
+
+  <h3>1.1 两条独立的数据线</h3>
+  <div class="grid2">
+    <div class="box bd b-blue">
+      <div class="t">A · 歌曲内容线（离线，阶段 1 产出）</div>
+      <div class="d">500 首歌 → 文本卡片 → bge-m3 编码 → <b>一个向量矩阵</b></div>
+      <div style="margin-top:9px"><span class="shape b">(500, 1024)</span> float32 · 每行 L2 归一化</div>
+    </div>
+    <div class="box bd b-pur">
+      <div class="t">B · 用户行为线（本阶段新造）</div>
+      <div class="d">口味档案 → 播放序列 → <b>一张行为表</b></div>
+      <div style="margin-top:9px"><span class="shape p">(3000, 8)</span> 行 · user_plays</div>
+    </div>
+  </div>
+
+  <h3>1.2 A 线：歌曲向量是怎么算出来的</h3>
+
+  <div class="flow" style="margin-bottom:14px">
+    <div class="fstep">
+      <div class="ft">① 拼卡片文本</div>
+      <div class="fv">song card</div>
+      <div class="fs"><span class="shape">str</span></div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fstep">
+      <div class="ft">② 编码</div>
+      <div class="fv">bge-m3</div>
+      <div class="fs"><span class="shape">1024 维</span></div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fstep">
+      <div class="ft">③ 归一化</div>
+      <div class="fv">L2</div>
+      <div class="fs"><span class="shape">‖v‖₂ = 1</span></div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fstep">
+      <div class="ft">④ 落盘</div>
+      <div class="fv">numpy 矩阵</div>
+      <div class="fs"><span class="shape g">(500, 1024)</span></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="t" style="font-size:13.5px">① 卡片文本长什么样（模板 <code>tpl_v1</code>）</div>
+<pre><span class="c">// 每首歌拼成一行文本，这就是被编码的对象</span>
+<span class="s">"Leave the Bottle / Forget the Whale / 风格:摇滚、民谣、拉丁 / 情绪:燃、怀旧、神秘</span>
+<span class="s"> / 场景:开车、旅行、深夜 / 西部亡命故事配摇滚民谣，劝人放下酒瓶。</span>
+<span class="s"> / Leave the Bottle: There's no sophisticated moralizing way - we can start with a bottle of rose…"</span></pre>
+    <div class="d">格式：<span class="mono">歌名 / 歌手 / 风格 / 情绪 / 场景 / 中文摘要 / 前 4 行歌词</span></div>
+  </div>
+
+  <table class="plain" style="margin-top:12px">
+    <tr><th style="width:70px">第几段</th><th>内容</th><th style="width:190px">来源</th></tr>
+    <tr><td class="mono">1</td><td>Leave the Bottle</td><td class="mono">songs.name</td></tr>
+    <tr><td class="mono">2</td><td><b>Forget the Whale</b>　← 歌手</td><td class="mono">singers.name</td></tr>
+    <tr><td class="mono">3</td><td>风格:摇滚、民谣、拉丁</td><td class="mono">song_tags (genre)</td></tr>
+    <tr><td class="mono">4–5</td><td>情绪 / 场景</td><td class="mono">song_tags (mood/scene)</td></tr>
+    <tr><td class="mono">6</td><td>一句中文摘要</td><td class="mono">songs.introduction</td></tr>
+    <tr><td class="mono">7</td><td>前 4 行歌词</td><td class="mono">song_lyric_lines</td></tr>
+  </table>
+
+  <div class="callout">
+    <b>歌名和歌手是裸字符串，没有字段标签</b>——只有标签类字段带「风格:」这种前缀。
+    这是契约 C6 的模板定义，代价是编码器看到的是两个并列字符串，
+    不一定能区分"这是歌名、那是歌手"。
+  </div>
+
+  <div class="note">
+    这张卡片同时是<b>向量编码的输入</b>和<b>交叉编码器重排的输入</b> —— 两个模型看同一段文本。
+  </div>
+
+  <h3>1.3 索引长什么样（磁盘上的形状）</h3>
+
+  <div class="tree">
+<span class="dir">data_pipeline/data/index/</span>
+├── <span class="f">index_meta.json</span>          <span class="sz">← model / dim / metric / template / 条数</span>
+└── <span class="dir">songs_v1/</span>
+    ├── <span class="hl">embeddings.npy</span>        <span class="sz">(500, 1024)  float32   ← 向量本体</span>
+    ├── <span class="f">ids.json</span>               <span class="sz">["1821524", "1537329", …]  500 个字符串</span>
+    └── <span class="f">docs.json</span>              <span class="sz">500 段卡片文本（和 ids 逐行对齐）</span>
+  </div>
+
+  <table class="plain" style="margin-top:14px">
+    <tr><th style="width:190px">字段</th><th>值</th><th>含义</th></tr>
+    <tr><td class="mono">embeddings.shape</td><td class="mono">(500, 1024)</td><td>500 首歌 × 1024 维</td></tr>
+    <tr><td class="mono">embeddings.dtype</td><td class="mono">float32</td><td>4 字节/维 → 约 2.0 MB</td></tr>
+    <tr><td class="mono">每行范数</td><td class="mono">1.0000</td><td>已 L2 归一化 → 点积即余弦</td></tr>
+    <tr><td class="mono">ids</td><td class="mono">str</td><td>Jamendo 歌曲 id；<b>行号 ↔ id 靠它对齐</b></td></tr>
+    <tr><td class="mono">检索方式</td><td class="mono">矩阵点积</td><td><code>emb @ q</code> → 500 个分数 → argsort</td></tr>
+  </table>
+
+  <div class="callout">
+    <b>没有用向量数据库</b>。500 × 1024 只是 2 MB，一次全量点积是微秒级 ——
+    暴力检索就是最优解，上 FAISS/Milvus 反而是过度设计。
+  </div>
+
+  <h3>1.4 B 线：用户行为是怎么造出来的</h3>
+
+  <div class="flow" style="margin-bottom:14px">
+    <div class="fstep">
+      <div class="ft">① 抽口味</div>
+      <div class="fv">1–3 流派<br>1–3 情绪 · 1–2 场景</div>
+      <div class="fs"><span class="shape p">set[str]</span></div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fstep">
+      <div class="ft">② 选歌</div>
+      <div class="fv">75% 口味内<br>25% 全库随机</div>
+      <div class="fs"><span class="shape">song_id</span></div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fstep">
+      <div class="ft">③ 算完成率</div>
+      <div class="fv">base + 0.45 × match<br>+ 噪声</div>
+      <div class="fs"><span class="shape">0.02–1.0</span></div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fstep">
+      <div class="ft">④ 入库</div>
+      <div class="fv">200 用户 × 15 条</div>
+      <div class="fs"><span class="shape g">3000 行</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="box bd b-pur">
+      <div class="t" style="font-size:13.5px">口味从哪来</div>
+      <div class="d">
+        从<b>真实标签分布</b>里抽，权重 = 频次<sup>0.75</sup>（压头部、保留长尾）<br>
+        用户 id 从 <code>100000</code> 起，与真实注册用户隔开
+      </div>
+    </div>
+    <div class="box bd b-green">
+      <div class="t" style="font-size:13.5px">完成率为什么这么算</div>
+      <div class="d">
+        <code>base</code>：口味内 0.55 / 探索 0.15<br>
+        <code>match</code>：偏好标签被这首歌满足的比例<br>
+        <b>这条因果链就是模型要学的东西</b>
+      </div>
+    </div>
+  </div>
+
+  <h3>1.5 数据库里的结构</h3>
+
+  <div class="ddl">
+<span class="tbl">user_plays</span>   <span class="cm">-- 3005 行：5 条真实 + 3000 条合成</span>
+├── <span class="col">id</span>              <span class="ty">int</span>          <span class="pk">PK</span>  <span class="cm">自增</span>
+├── <span class="col">user_id</span>         <span class="ty">int</span>              <span class="cm">合成用户 ≥ 100000；真实用户 1、2</span>
+├── <span class="col">song_id</span>         <span class="ty">int</span>              <span class="cm">→ songs.id（Jamendo id）</span>
+├── <span class="col">play_duration</span>   <span class="ty">int</span>              <span class="cm">播放时长（秒）</span>
+├── <span class="col">full_duration</span>   <span class="ty">int</span>              <span class="cm">歌曲总时长（秒）  ← 两者相除 = 完成率</span>
+├── <span class="col">is_liked</span>        <span class="ty">tinyint(1)</span>       <span class="cm">0/1</span>
+├── <span class="col">play_time</span>       <span class="ty">datetime</span>         <span class="cm">留一法靠它排序取"最后一次"</span>
+├── <span class="col">device_type</span>     <span class="ty">varchar(20)</span>
+├── <span class="col">source</span>          <span class="ty">enum</span>('real','synthetic')  <span class="cm">真实/合成隔离</span>
+└── <span class="col">created_at / updated_at</span>  <span class="ty">datetime</span>
+
+<span class="cm">索引： (user_id, play_time)  ← 取某用户历史；  (song_id)</span>
+  </div>
+
+  <table class="plain" style="margin-top:14px">
+    <tr><th style="width:170px">关联表</th><th>提供什么</th><th>在模型里用在哪</th></tr>
+    <tr><td class="mono">songs</td><td>歌名、歌手、封面、<code>/stream/{id}</code></td><td>输出与展示</td></tr>
+    <tr><td class="mono">song_tags</td><td>genre / mood / scene（5510 行）</td><td><b>拼卡片文本</b>；合成数据的口味匹配</td></tr>
+    <tr><td class="mono">song_meta</td><td>duration_s、vocal、language</td><td>算完成率的分母；卡片文本</td></tr>
+  </table>
+
+  <div class="note">
+    一行真实数据的样子：<br>
+    <code>(user_id=2, song_id=1807112, play_duration=74, full_duration=165, source='real')</code>
+    → 完成率 = 74 / 165 = <b>0.448</b>
+  </div>
+
+  <!-- ==================================================== 02 模型 -->
+  <h2><span class="n">02</span>模型：内容双塔</h2>
+
+  <h3>2.1 结构（括号里是张量形状）</h3>
+
+  <div class="tt">
+    <div class="towers">
+
+      <div class="tower blue">
+        <div class="th"><span class="tg tg-b">歌曲塔</span> 输入：内容向量</div>
+        <div class="layer"><span class="ln">song vector</span><span class="shape b">(1024)</span></div>
+        <div class="down">↓</div>
+        <div class="layer"><span class="ln">Linear 1024 → 256</span><span class="shape">(256)</span></div>
+        <div class="down">↓</div>
+        <div class="layer"><span class="ln">ReLU · Dropout 0.2</span><span class="shape">(256)</span></div>
+        <div class="down">↓</div>
+        <div class="layer"><span class="ln">Linear 256 → 64</span><span class="shape">(64)</span></div>
+        <div class="down">↓</div>
+        <div class="layer hl"><span class="ln">L2 归一化</span><span class="shape p">(64) ‖s‖=1</span></div>
+      </div>
+
+      <div class="tower purple">
+        <div class="th"><span class="tg tg-p">用户塔</span> 输入：历史歌曲</div>
+        <div class="layer"><span class="ln">历史 song vectors</span><span class="shape">(N, 1024)</span></div>
+        <div class="down">↓</div>
+        <div class="layer hl"><span class="ln">完成率加权平均</span><span class="shape b">(1024)</span></div>
+        <div class="down">↓</div>
+        <div class="layer"><span class="ln">Linear 1024 → 256</span><span class="shape">(256)</span></div>
+        <div class="down">↓</div>
+        <div class="layer"><span class="ln">ReLU · Dropout 0.2</span><span class="shape">(256)</span></div>
+        <div class="down">↓</div>
+        <div class="layer"><span class="ln">Linear 256 → 64</span><span class="shape">(64)</span></div>
+        <div class="down">↓</div>
+        <div class="layer hl"><span class="ln">L2 归一化</span><span class="shape p">(64) ‖u‖=1</span></div>
+      </div>
+    </div>
+
+    <div class="fan"><span>╲</span><span>╱</span></div>
+    <div class="out">
+      <div class="outbox">score = 5 × ⟨u, s⟩　　→ 即 5 × cos(u, s)</div>
+    </div>
+  </div>
+
+  <div class="note">
+    两根塔结构完全相同，只是<b>输入不同</b>：歌曲塔吃一首歌的向量，用户塔吃他听过的歌的加权平均。
+    两侧都归一化，所以点积就是余弦。
+  </div>
+
+  <h3>2.2 一次前向的形状流</h3>
+
+  <table class="plain">
+    <tr><th style="width:230px">步骤</th><th>形状</th><th>说明</th></tr>
+    <tr><td class="mono">一个 batch 的歌</td><td class="mono">(B, 1024)</td><td>B 条 (用户, 歌) 对</td></tr>
+    <tr><td class="mono">用户历史加权平均</td><td class="mono">(B, 1024)</td><td>每条样本各自的历史</td></tr>
+    <tr><td class="mono">歌曲塔前向</td><td class="mono">(B, 64)</td><td>batch 内独立</td></tr>
+    <tr><td class="mono">用户塔前向</td><td class="mono">(B, 64)</td><td>batch 内独立</td></tr>
+    <tr><td class="mono">逐行点积</td><td class="mono">(B,)</td><td><code>(u*s).sum(dim=-1)</code></td></tr>
+    <tr><td class="mono">× 5 → logits</td><td class="mono">(B,)</td><td>余弦 ∈ [-1,1]，乘 5 让 BCE 梯度健康</td></tr>
+    <tr><td class="mono">BCEWithLogitsLoss</td><td class="mono">标量</td><td>与 0/1 标签比较</td></tr>
+  </table>
+
+  <h3>2.3 训练目标</h3>
+
+  <div class="grid3">
+    <div class="box bd b-green">
+      <div class="t" style="font-size:13.5px">正样本</div>
+      <div class="d">完成率 ≥ 0.6 的播放<br><b>1,940 条</b></div>
+    </div>
+    <div class="box bd b-amber">
+      <div class="t" style="font-size:13.5px">负样本 ①</div>
+      <div class="d">完成率 ≤ 0.3（用户主动跳过）</div>
+    </div>
+    <div class="box bd b-amber">
+      <div class="t" style="font-size:13.5px">负样本 ②</div>
+      <div class="d">每正样本采 4 首<br>该用户没听过的歌<br><b>共 8,269 条</b></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>防泄漏</b>：算某条正样本的用户向量时，只用该用户<b>其他</b>播放，排除这条样本自己的歌。
+  </div>
+
+  <h3>2.4 为什么是这三个设计</h3>
+
+  <table class="plain">
+    <tr><th style="width:210px">设计</th><th>原因</th></tr>
+    <tr>
+      <td>歌曲塔吃 bge-m3 向量，<b>不是 ID embedding</b></td>
+      <td>新歌一入库就有向量（来自文本卡片），<b>冷启动天然可解</b>；
+        且零成本复用 A 线的索引。</td>
+    </tr>
+    <tr>
+      <td>用户塔 = 历史向量的<b>加权平均</b></td>
+      <td>用户也活在同一个内容空间；新用户听几首就能被服务，不需要训练他的 ID。</td>
+    </tr>
+    <tr>
+      <td>权重用<b>完成率</b>，不是简单平均</td>
+      <td>听完 95% 的歌远比听 10 秒跳过的歌更能代表口味。
+        简单平均会把 14–20 首歌糊成一个点 —— 实测 Hit@50 从 0.315 掉到 0.145。</td>
+    </tr>
+  </table>
+
+  <div class="foot">
+    代码：<b>recommend/recsys/</b>（data · features · model · train · evaluate · serve）·
+    完整实验：<b>recommend/REPORT_v2.md</b> ·
+    索引构建：<b>data_pipeline/08_build_index.py</b>
+  </div>
+
+</div>
+</body>
+</html>

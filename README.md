@@ -1,363 +1,111 @@
-# MyMusic 智能音乐推荐系统
+# HarmonyMusic · 智能音乐 App（搜歌 Agent + 推荐系统）
 
-一个基于AI的全栈音乐推荐平台，集成了移动端应用、后端API服务和智能推荐引擎。
+一个完整的音乐应用：**鸿蒙客户端 + Koa 后端 + 搜歌 Agent + 推荐系统**，曲库是自建的 500 首 Jamendo（CC 协议）歌曲，带逐句时间戳歌词。
 
-## 🎵 项目简介
-
-MyMusic是一个现代化的音乐推荐系统，采用微服务架构，提供个性化音乐推荐服务。系统包含三个核心模块：
-
-- **移动端应用** (HarmonyOS/Android)
-- **后端API服务** (Node.js + Koa)  
-- **AI推荐引擎** (Python + TensorFlow)
-
-## 🏗️ 项目架构
-
-```
-withRecommend/
-├── myMusic/           # 鸿蒙移动端应用
-├── openKoa/          # Node.js后端API服务
-├── recommend/        # Python AI推荐系统
-├── agent/            # 搜歌 Agent（意图解析 + 多路召回 + 重排 + 多轮）
-├── data_pipeline/    # 阶段1数据流水线（Jamendo 拉取/歌词对齐/打标签/入库/建索引）
-├── db/               # 数据库结构 schema_v1.sql + 种子 seed_v1.sql + 自检 check_v1.sql
-├── resources/        # 本地模型缓存（bge-m3 / bge-reranker，gitignored）
-├── music.sql         # MySQL数据库初始化脚本
-└── README.md         # 项目文档
-```
-
-## 🎯 AI 搜歌 Agent（`agent/`）
-
-在 500 首 Jamendo 曲库上的自然语言搜歌 Agent：把「下雨天听的伤感歌」「有句歌词是……」「换一首」这类请求，
-解析成结构化约束后**多路检索**（关键词 BM25 / 歌词（中英双语）检索 / 向量语义检索），融合、硬约束过滤、
-交叉编码重排，并在查不到时**拒答**而不是编造。
-
-- 数据底座与评测见 `DocsForMusicAgent/`（`phase12_report.md`、`phase3_report.md`、契约 `contracts_v1.md`）。
-- 服务：`uvicorn agent.app:app --port 8000`（工具层 `/tool/{name}`、单轮 `/agent/search`、多轮 `/agent/chat`）；
-  用带 torch 的解释器 `D:\apps\tools\Conda\python.exe` 运行。
-- App 接入：Koa `POST /agent/chat`（JWT + SSE 流式）→ 鸿蒙 `pages/AiSearch.ets`「AI 搜歌」页。
-
-**评测（dev 109 / test 74，k=5）**：三类合并 Hit@5 = **1.00**；曲库没有时拒答率 **1.00**；编造率 0。
-对比基线：整库入 prompt(B1) 0.61、单次向量(B2) 0.78（test 上均低于本 Agent）。详见 `phase3_report.md`。
-
-
-## ✨ 核心功能
-
-### 移动端应用 (myMusic)
-- 🎧 音乐播放和控制
-- 👤 用户注册和登录
-- 📱 现代化移动UI界面
-- 🔄 实时推荐更新
-- ❤️ 收藏和播放列表管理
-
-### 后端API服务 (openKoa)
-- 🔐 用户认证和授权 (JWT)
-- 🎵 音乐资源管理
-- 👥 用户数据管理
-- 📊 播放记录统计
-- 🖼️ 文件上传和管理
-
-### AI推荐引擎 (recommend)
-- 🧠 双塔神经网络架构
-- 📈 实时个性化推荐
-- 🔮 协同过滤算法
-- 📊 用户行为分析
-- 🎯 智能推荐API
-
-## 🛠️ 技术栈
-
-### 前端技术
-- **开发框架**: HarmonyOS/ArkTS
-- **UI组件**: ArkUI组件库
-- **状态管理**: 本地状态管理
-- **网络请求**: HTTP客户端
-
-### 后端技术
-- **运行环境**: Node.js 16+
-- **Web框架**: Koa.js 2.x
-- **数据库**: MySQL 8.0
-- **ORM**: Sequelize
-- **认证**: JWT (JSON Web Token)
-- **文件处理**: Multer
-
-### AI推荐技术
-- **机器学习**: TensorFlow 2.15
-- **数据处理**: Pandas, NumPy
-- **神经网络**: 双塔架构 (LSTM + Dense)
-- **数据库连接**: PyMySQL
-
-### 数据库设计
-- **用户管理**: 用户表、管理员表
-- **音乐数据**: 歌曲表、歌手表、歌单表
-- **行为数据**: 收藏表、评分表、播放记录
-- **系统数据**: 轮播图表
-
-## 🚀 快速开始
-
-### 环境要求
-
-- **Node.js**: 16.0.0+
-- **Python**: 3.8+
-- **MySQL**: 8.0+
-- **DevEco Studio**: 4.0+ (鸿蒙开发)
-
-### 1. 克隆项目
-
-```bash
-git clone <repository-url>
-cd withRecommend
-```
-
-### 2. 数据库初始化
-
-```bash
-# 创建MySQL数据库
-mysql -u root -p
-
-# 在MySQL命令行中执行
-CREATE DATABASE music;
-USE music;
-SOURCE music.sql;
-```
-
-### 3. 后端服务部署
-
-```bash
-cd openKoa
-
-# 安装依赖
-npm install
-
-# 配置数据库连接
-# 编辑 config/db.js 文件
-
-# 启动开发服务器
-npm run dev
-
-# 生产环境启动
-npm start
-```
-
-### 4. AI推荐系统部署
-
-```bash
-cd recommend
-
-# 安装Python依赖
-pip install -r requirements.txt
-
-# 检查系统状态
-python main.py check
-
-# 生成测试数据（首次运行）
-python main.py generate
-
-# 训练模型
-python main.py train
-
-# 生成推荐
-python main.py predict
-```
-
-### 5. 移动端应用开发
-
-```bash
-cd myMusic
-
-# 使用DevEco Studio打开项目
-# 1. 打开DevEco Studio
-# 2. 选择"Open Project"
-# 3. 选择myMusic目录
-# 4. 配置签名和构建
-# 5. 运行到设备或模拟器
-```
-
-## 📊 数据库结构
-
-### 核心数据表
-
-| 表名 | 描述 | 主要字段 |
-|------|------|----------|
-| consumers | 用户信息 | id, username, password, email, phone |
-| singers | 歌手信息 | id, name, sex, pic, location |
-| songs | 歌曲信息 | id, singer_id, name, pic, lyric, url |
-| song_lists | 歌单信息 | id, title, pic, introduction, style |
-| collects | 用户收藏 | id, user_id, song_id |
-| ranks | 歌单评分 | id, song_list_id, consumer_id, score |
-| swipers | 轮播图 | id, title, url, imgurl |
-| admins | 管理员 | id, username, password |
-
-### 推荐系统数据表
-
-| 表名 | 描述 | 主要字段 |
-|------|------|----------|
-| user_plays | 播放记录 | user_id, song_id, play_count, timestamp |
-
-## 🔧 配置说明
-
-### 后端配置 (openKoa/config/db.js)
-
-```javascript
-module.exports = {
-  host: 'localhost',
-  port: 3306,
-  database: 'music',
-  username: 'root',
-  password: 'your_password',
-  dialect: 'mysql'
-}
-```
-
-### 推荐系统配置 (recommend/src/config.py)
-
-```python
-DATABASE_CONFIG = {
-    'host': 'localhost',
-    'port': 3306,
-    'database': 'music',
-    'user': 'root',
-    'password': 'your_password'
-}
-```
-
-## 📱 API接口文档
-
-### 用户认证接口
-
-- `POST /api/login` - 用户登录
-- `POST /api/register` - 用户注册
-- `GET /api/user/info` - 获取用户信息
-
-### 音乐管理接口
-
-- `GET /api/songs` - 获取歌曲列表
-- `GET /api/singers` - 获取歌手列表
-- `GET /api/songlists` - 获取歌单列表
-- `POST /api/collect` - 添加收藏
-- `DELETE /api/collect/:id` - 取消收藏
-
-### 推荐系统接口
-
-- `GET /api/recommend/:userId` - 获取用户推荐
-- `POST /api/feedback` - 用户反馈
-
-## 🧠 AI推荐算法
-
-### 双塔神经网络架构
-
-```
-用户塔 (User Tower)              歌曲塔 (Item Tower)
-┌─────────────────┐              ┌─────────────────┐
-│   用户特征输入    │              │   歌曲特征输入    │
-│                 │              │                 │
-│ ┌─────────────┐ │              │ ┌─────────────┐ │
-│ │ Embedding   │ │              │ │ Embedding   │ │
-│ └─────────────┘ │              │ └─────────────┘ │
-│        │        │              │        │        │
-│ ┌─────────────┐ │              │ ┌─────────────┐ │
-│ │   LSTM      │ │              │ │   Dense     │ │
-│ └─────────────┘ │              │ └─────────────┘ │
-│        │        │              │        │        │
-│ ┌─────────────┐ │              │ ┌─────────────┐ │
-│ │   Dense     │ │              │ │   Dense     │ │
-│ └─────────────┘ │              │ └─────────────┘ │
-└─────────────────┘              └─────────────────┘
-         │                                │
-         └────────────┬───────────────────┘
-                      │
-              ┌─────────────┐
-              │ 相似度计算   │
-              │(Cosine)     │
-              └─────────────┘
-```
-
-### 推荐流程
-
-1. **特征提取**: 提取用户行为特征和歌曲内容特征
-2. **向量编码**: 通过双塔网络生成用户和歌曲的向量表示
-3. **相似度计算**: 计算用户向量与歌曲向量的余弦相似度
-4. **排序推荐**: 根据相似度分数排序，返回Top-N推荐
-
-## 🔒 安全说明
-
-### 用户认证
-- 使用JWT令牌进行用户认证
-- 密码采用MD5加密存储
-- API接口支持CORS跨域访问
-
-### 数据安全
-- 敏感信息加密存储
-- SQL注入防护
-- 文件上传类型限制
-
-## 📈 性能优化
-
-### 后端优化
-- 数据库连接池
-- Redis缓存 (可选)
-- 静态资源CDN
-
-### 推荐系统优化
-- 模型缓存机制
-- 批量预测优化
-- 增量训练支持
-
-## 🧪 测试
-
-### 后端测试
-
-```bash
-cd openKoa
-npm test
-```
-
-### 推荐系统测试
-
-```bash
-cd recommend
-python -m pytest tests/
-```
-
-## 📦 部署
-
-### Docker部署 (推荐)
-
-```bash
-# 构建和启动所有服务
-docker-compose up -d
-
-# 查看服务状态
-docker-compose ps
-```
-
-### 传统部署
-
-1. **数据库部署**: 安装MySQL并导入数据
-2. **后端部署**: 使用PM2部署Node.js应用
-3. **推荐系统部署**: 使用Gunicorn部署Python服务
-4. **移动端部署**: 打包并发布到应用商店
-
-## 🤝 贡献指南
-
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开 Pull Request
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
-
-## 📞 联系方式
-
-- 项目维护者: [Your Name]
-- 邮箱: [your.email@example.com]
-- 项目链接: [GitHub Repository]
-
-## 🙏 致谢
-
-感谢所有为这个项目做出贡献的开发者和用户！
+> 设计与评测记录在 [`DocsForMusicAgent/`](DocsForMusicAgent/README.md)，**先看那个索引**。
 
 ---
 
-**注意**: 这是一个学习和演示项目，如需商业使用请确保遵循相关法律法规和版权要求。
+## 架构
+
+```
+鸿蒙 App (myMusic/, ArkTS)
+   │  HTTP :3000（JSON / SSE）
+   ▼
+Koa 后端 (openKoa/)  ── Sequelize ──►  MySQL mymusic（14 张表，500 首）
+   │  /stream/:id → 302 跳 Jamendo
+   │
+   ├─ POST /agent/chat ──►  搜歌 Agent (agent/, FastAPI :8000)
+   │                          DeepSeek + bge-m3 + bge-reranker + BM25
+   │
+   └─ exec(python) ──────►  推荐系统 (recommend/, PyTorch 内容双塔)
+```
+
+| 目录 | 是什么 | 技术栈 |
+|---|---|---|
+| `myMusic/` | 鸿蒙客户端（首页 / 我的歌单 / 评论 / 我的 + 播放页 + AI 搜歌） | HarmonyOS ArkTS |
+| `openKoa/` | 唯一的对外 REST 入口，JWT 鉴权 | Koa 2 + Sequelize |
+| `agent/` | 搜歌 Agent：意图 → 召回 → 排序 → 校验 → 回复 | FastAPI + PyTorch |
+| `recommend/` | 内容双塔推荐（歌曲塔吃 bge-m3 向量） | PyTorch |
+| `data_pipeline/` | 离线建库：Jamendo → 歌词对齐 → 打标签 → 入库 → 建索引 | Python |
+| `db/` | `schema_v1.sql`（权威）+ `seed_v1.sql`（生成） | MySQL 8 |
+| `DocsForMusicAgent/` | 设计、契约、评测、迭代记录 | — |
+
+**模块之间没有构建系统耦合**，只通过 HTTP 和子进程通信，每个模块都能单独起、单独测。
+
+---
+
+## 快速启动
+
+> 前置：MySQL 8 在 `127.0.0.1:3306`，库名 `mymusic`（`root` / `123456`）。
+> Agent 和推荐系统需要 torch，用 `D:\apps\tools\Conda\python.exe`（系统 python 没有）。
+
+```bash
+# 1) 数据库（首次）
+mysql -uroot -p < db/schema_v1.sql
+mysql -uroot -p mymusic < db/seed_v1.sql
+
+# 2) 搜歌 Agent（:8000）
+D:\apps\tools\Conda\python.exe -m uvicorn agent.app:app --port 8000
+
+# 3) Koa 后端（:3000）
+cd openKoa && node bin/www
+
+# 4) 鸿蒙客户端：DevEco 打开 myMusic/ 编译运行
+#    模拟器详细步骤见 myMusic/RUN_ON_EMULATOR.md
+```
+
+`.env` 里需要 `JAMENDO_CLIENT_ID`、`DEEPSEEK_API_KEY`、`RECOMMEND_PYTHON`（指向带 torch 的解释器）。
+模板见 `.env.example`。
+
+**模拟器注意**：App 里写的是 `localhost:3000`，模拟器里的 localhost 不是宿主机，需要
+`hdc rport tcp:3000 tcp:3000` 打通。
+
+---
+
+## 关键数字
+
+**曲库**：500 首（328 位歌手）、11,148 行逐句歌词（6,823 行可检索）、5,510 个标签、37 个歌单。
+
+**搜歌 Agent**（test 集，k=5）：
+
+| | Agent | B1 整库塞 prompt | B2 单次向量 | B0 直接猜 |
+|---|---|---|---|---|
+| title+lyric+describe 合并 Hit@5 | **1.000** | 0.610 | 0.780 | ≈0 |
+| 歌词片段 Hit@5 | **1.000** | 0.125 | 0.625 | 0.042 |
+| 曲库没有时拒答 | **1.000** | 0.067 | 0 | — |
+
+回归：`pytest agent/tests` **22 passed**、`python -m agent.e2e_smoke` **12/12 passed**。
+**未达标项**：曲库外歌词拒答按子类拆开后，知名 0.70（目标 0.90）、冷门 0.633 —— 已终结，原因见
+[`DocsForMusicAgent/phase3_report.md`](DocsForMusicAgent/phase3_report.md)。
+
+**推荐系统**（留一法，200 合成用户 / 500 首）：Hit@50 **0.315**，对比热门 0.180、随机 0.100。
+完整实验（含没跑赢的基线）见 [`recommend/REPORT_v2.md`](recommend/REPORT_v2.md)。
+
+---
+
+## 文档导航
+
+| 想了解 | 去看 |
+|---|---|
+| 全部设计文档的索引与阅读顺序 | [`DocsForMusicAgent/README.md`](DocsForMusicAgent/README.md) |
+| 冻结契约（ID / 表 / 词表 / 接口） | [`DocsForMusicAgent/contracts_v1.md`](DocsForMusicAgent/contracts_v1.md) |
+| 设计取舍与已知短板 | [`DocsForMusicAgent/design_and_gaps.md`](DocsForMusicAgent/design_and_gaps.md) |
+| 验收清单 | [`DocsForMusicAgent/acceptance.md`](DocsForMusicAgent/acceptance.md) |
+| 架构图（可视化） | [`DocsForMusicAgent/architecture.html`](DocsForMusicAgent/architecture.html) |
+| **Agent 数据结构 + 真实 trace** | [`DocsForMusicAgent/agent.html`](DocsForMusicAgent/agent.html) |
+| 推荐系统实验 | [`recommend/REPORT_v2.md`](recommend/REPORT_v2.md) · 可视化 [`recommend/recsys.html`](recommend/recsys.html) |
+| 模拟器跑通步骤 | [`myMusic/RUN_ON_EMULATOR.md`](myMusic/RUN_ON_EMULATOR.md) |
+| 数据流水线 | [`data_pipeline/README.md`](data_pipeline/README.md) |
+| Agent 服务 | [`agent/README.md`](agent/README.md) |
+| 工程约定（给 AI/新人的说明） | [`CLAUDE.md`](CLAUDE.md) |
+
+---
+
+## 已知限制（摘要）
+
+- 曲库全英文 / 纯音乐，无中文歌（Jamendo 的 `lang` 过滤在本 API 失效）。
+- 推荐系统的训练数据是**合成的**，指标上限由合成分布决定，不等于真实效果。
+- 客户端只在模拟器验证过，未在真机跑。
+- `user_plays` 的真实播放记录还很少（个位数），长期偏好基本没数据。
+- 详细清单见 [`DocsForMusicAgent/design_and_gaps.md`](DocsForMusicAgent/design_and_gaps.md)。

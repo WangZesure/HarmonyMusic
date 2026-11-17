@@ -1,7 +1,7 @@
 # 阶段 4 报告：多轮对话与记忆
 
 > 2026-10-13。承接阶段 3（见 `phase3_report.md`）。代码：`agent/core/chat.py`、`agent/core/session.py`、`POST /agent/chat`。
-> 需求来源：`featureToDo.md` 阶段 4（会话状态 + 长期偏好）。
+> 需求来源：`archive/featureToDo.md` 阶段 4（会话状态 + 长期偏好）。
 
 ## 1. 实现
 

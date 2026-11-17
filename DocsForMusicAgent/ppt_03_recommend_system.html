@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图3 · 音乐推荐系统架构 (Content Two-Tower v2)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #ffffff;
+    color: #0f172a;
+    font-family: "Inter", "Segoe UI", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 12px 16px;
+    background: #ffffff;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <svg width="1440" height="780" viewBox="0 0 1440 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline of Content Two-Tower Recommendation System">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0,1 L10,5 L0,9 z" fill="#1e293b"/>
+      </marker>
+      <marker id="arr-red" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0,1 L10,5 L0,9 z" fill="#dc2626"/>
+      </marker>
+      <marker id="arr-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0,1 L10,5 L0,9 z" fill="#0284c7"/>
+      </marker>
+      <marker id="arr-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0,1 L10,5 L0,9 z" fill="#d97706"/>
+      </marker>
+
+      <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="112%">
+        <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.06"/>
+      </filter>
+    </defs>
+
+    <!-- ======================================================================= -->
+    <!-- 1. TOP BRANCH: SONG CONTENT LINE (Frozen BGE-M3 -> Song Vector v_s)     -->
+    <!-- ======================================================================= -->
+    <g filter="url(#card-shadow)">
+      <rect x="24" y="68" width="190" height="148" rx="12" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+    </g>
+    <text x="119" y="98" text-anchor="middle" font-size="16.5" font-weight="800" fill="#0f172a">Song Card Text</text>
+    <line x1="42" y1="110" x2="196" y2="110" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="40" y="122" width="158" height="24" rx="5" fill="#dbeafe"/>
+    <text x="119" y="139" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">歌名 (name) / 歌手 (artist)</text>
+    <rect x="40" y="152" width="158" height="24" rx="5" fill="#e0e7ff"/>
+    <text x="119" y="169" text-anchor="middle" font-size="12" font-weight="700" fill="#3730a3">风格 · 情绪 · 场景标签</text>
+    <rect x="40" y="182" width="158" height="24" rx="5" fill="#f1f5f9"/>
+    <text x="119" y="199" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">中文摘要 + 前 4 行歌词</text>
+
+    <line x1="214" y1="142" x2="254" y2="142" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- Frozen BGE-M3 Encoder Trapezoid (Clean FROZEN vector badge instead of emoji) -->
+    <polygon points="258,72 364,98 364,186 258,212" fill="#f1f5f9" stroke="#475569" stroke-width="2" filter="url(#card-shadow)"/>
+    <rect x="276" y="96" width="70" height="20" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.2"/>
+    <text x="311" y="110" text-anchor="middle" font-size="10" font-weight="800" fill="#0369a1">FROZEN</text>
+    <text x="311" y="142" text-anchor="middle" font-size="16" font-weight="800" fill="#0f172a">BGE-M3</text>
+    <text x="311" y="162" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">Text Encoder</text>
+    <text x="311" y="232" text-anchor="middle" font-size="12.5" font-weight="700" fill="#475569">无 ID Embedding</text>
+
+    <line x1="364" y1="142" x2="404" y2="142" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- Offline Song Vector Matrix Box -->
+    <g filter="url(#card-shadow)">
+      <rect x="406" y="76" width="204" height="130" rx="12" fill="#eff6ff" stroke="#0284c7" stroke-width="2"/>
+    </g>
+    <text x="508" y="106" text-anchor="middle" font-size="16" font-weight="800" fill="#0369a1">Song Vector <tspan font-family="Cambria Math, Times New Roman, serif" font-style="italic" font-size="19">v</tspan><tspan font-family="Cambria Math, Times New Roman, serif" baseline-shift="sub" font-size="13.5">s</tspan></text>
+    <rect x="428" y="116" width="160" height="24" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <g fill="#2563eb">
+      <rect x="436" y="121" width="9" height="14" rx="2"/><rect x="450" y="121" width="9" height="14" rx="2"/>
+      <rect x="464" y="121" width="9" height="14" rx="2"/><rect x="478" y="121" width="9" height="14" rx="2"/>
+      <rect x="492" y="121" width="9" height="14" rx="2"/><rect x="506" y="121" width="9" height="14" rx="2"/>
+      <rect x="520" y="121" width="9" height="14" rx="2"/><rect x="534" y="121" width="9" height="14" rx="2"/>
+      <rect x="548" y="121" width="9" height="14" rx="2"/><rect x="562" y="121" width="9" height="14" rx="2"/>
+    </g>
+    <text x="508" y="168" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="18" font-weight="800" fill="#1e3a8a"><tspan font-style="italic">v</tspan><tspan baseline-shift="sub" font-size="13">s</tspan> ∈ ℝ<tspan baseline-shift="super" font-size="12.5">1024</tspan>  (‖<tspan font-style="italic">v</tspan><tspan baseline-shift="sub" font-size="13">s</tspan>‖<tspan baseline-shift="sub" font-size="12">2</tspan> = 1)</text>
+    <text x="508" y="193" text-anchor="middle" font-size="12.5" font-weight="700" fill="#475569">离线索引矩阵 (500 × 1024)</text>
+
+    <!-- ======================================================================= -->
+    <!-- 2. BOTTOM BRANCH: USER PLAY LOGS & COMPLETION-WEIGHTED POOLING          -->
+    <!-- ======================================================================= -->
+    <g filter="url(#card-shadow)">
+      <rect x="24" y="382" width="190" height="168" rx="12" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+    </g>
+    <text x="119" y="412" text-anchor="middle" font-size="16.5" font-weight="800" fill="#0f172a">User Play Logs</text>
+    <text x="119" y="431" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">user_plays (最近 N ≤ 20 首)</text>
+    <line x1="42" y1="441" x2="196" y2="441" stroke="#cbd5e1" stroke-width="1.5"/>
+
+    <rect x="38" y="451" width="162" height="26" rx="5" fill="#dcfce7"/>
+    <text x="119" y="469" text-anchor="middle" font-size="13" font-weight="800" fill="#166534">Song A · 完播 <tspan font-family="Cambria Math, serif" font-style="italic" font-size="15">w</tspan><tspan baseline-shift="sub" font-size="10.5">1</tspan> = 0.95</text>
+
+    <rect x="38" y="483" width="162" height="26" rx="5" fill="#fef3c7"/>
+    <text x="119" y="501" text-anchor="middle" font-size="13" font-weight="800" fill="#92400e">Song B · 完播 <tspan font-family="Cambria Math, serif" font-style="italic" font-size="15">w</tspan><tspan baseline-shift="sub" font-size="10.5">2</tspan> = 0.65</text>
+
+    <rect x="38" y="515" width="162" height="26" rx="5" fill="#ffe4e6"/>
+    <text x="119" y="533" text-anchor="middle" font-size="13" font-weight="800" fill="#9f1239">Song C · 跳过 <tspan font-family="Cambria Math, serif" font-style="italic" font-size="15">w</tspan><tspan baseline-shift="sub" font-size="10.5">3</tspan> = 0.08</text>
+
+    <!-- Completion-Weighted Pooling Box -->
+    <rect x="252" y="370" width="358" height="192" rx="14" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>
+    <text x="431" y="400" text-anchor="middle" font-size="16" font-weight="800" fill="#0369a1">Completion-Weighted Pooling</text>
+    <text x="431" y="421" text-anchor="middle" font-size="12" font-weight="600" fill="#0284c7">训练 / 评测 / 推理严格共享 history_vector()</text>
+
+    <!-- Arrow: User Logs -> Formula Box -->
+    <line x1="214" y1="468" x2="264" y2="468" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- Lookup Arrow from Song Vector Matrix straight into the Formula Box (x=355) -->
+    <path d="M 508 206 V 285 H 355 V 432" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-dasharray="6 4" marker-end="url(#arr-blue)"/>
+    <rect x="364" y="270" width="176" height="30" rx="15" fill="#eff6ff" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="452" y="290" text-anchor="middle" font-size="13" font-weight="800" fill="#0369a1">查表取历史歌向量 {<tspan font-family="Cambria Math, serif" font-style="italic" font-size="15.5">v</tspan><tspan baseline-shift="sub" font-size="11">i</tspan>}</text>
+
+    <!-- Formula Box (Enlarged prominent math formula!) -->
+    <g filter="url(#card-shadow)">
+      <rect x="268" y="436" width="180" height="74" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+    </g>
+    <text x="358" y="468" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="18.5" font-weight="800" fill="#0f172a"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="13">u</tspan> = ∑ <tspan font-style="italic">w</tspan><tspan baseline-shift="sub" font-size="13">i</tspan><tspan font-style="italic">v</tspan><tspan baseline-shift="sub" font-size="13">i</tspan> / ∑ <tspan font-style="italic">w</tspan><tspan baseline-shift="sub" font-size="13">i</tspan></text>
+    <text x="358" y="496" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="14" font-weight="700" fill="#334155"><tspan font-style="italic">w</tspan><tspan baseline-shift="sub" font-size="10.5">i</tspan> = play_dur / full_dur</text>
+
+    <!-- Arrow: Formula -> h_u Vector -->
+    <line x1="448" y1="473" x2="474" y2="473" stroke="#1e293b" stroke-width="2.2" marker-end="url(#arr)"/>
+
+    <!-- User History Vector Bar h_u -->
+    <g filter="url(#card-shadow)">
+      <rect x="478" y="436" width="118" height="74" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+    </g>
+    <text x="537" y="468" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="18.5" font-weight="800" fill="#5b21b6"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="13">u</tspan> ∈ ℝ<tspan baseline-shift="super" font-size="12.5">1024</tspan></text>
+    <g fill="#7c3aed">
+      <rect x="493" y="482" width="8" height="16" rx="2"/><rect x="506" y="482" width="8" height="16" rx="2"/>
+      <rect x="519" y="482" width="8" height="16" rx="2"/><rect x="532" y="482" width="8" height="16" rx="2"/>
+      <rect x="545" y="482" width="8" height="16" rx="2"/><rect x="558" y="482" width="8" height="16" rx="2"/>
+      <rect x="571" y="482" width="8" height="16" rx="2"/>
+    </g>
+
+    <text x="431" y="542" text-anchor="middle" font-size="12" font-weight="700" fill="#0369a1">防泄漏：训练正样本时从历史中剔除目标歌自身</text>
+
+    <!-- ======================================================================= -->
+    <!-- 3. TWO-TOWER NEURAL NETWORK (Ample separation around Training Path)     -->
+    <!-- ======================================================================= -->
+    <rect x="642" y="46" width="472" height="552" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+    <text x="666" y="76" font-size="17.5" font-weight="800" fill="#0f172a">ContentTwoTower (PyTorch 双塔网络)</text>
+
+    <!-- UPPER TOWER: Song Tower (Shifted up cleanly to y=92..226) -->
+    <polygon points="672,92 920,108 920,210 672,226" fill="#2563eb" stroke="#1e40af" stroke-width="2" filter="url(#card-shadow)"/>
+    <rect x="742" y="104" width="112" height="19" rx="9.5" fill="#1e3a8a"/>
+    <text x="798" y="117" text-anchor="middle" font-size="9.5" font-weight="800" fill="#bfdbfe">TRAINABLE MLP</text>
+    <text x="798" y="145" text-anchor="middle" font-size="17" font-weight="800" fill="#ffffff">Song Tower</text>
+    <text x="798" y="170" text-anchor="middle" font-size="13.5" font-weight="700" fill="#dbeafe">Linear (1024 → 256) · ReLU · Dropout(0.2)</text>
+    <text x="798" y="193" text-anchor="middle" font-size="13.5" font-weight="700" fill="#dbeafe">Linear (256 → 64) + L2 Norm</text>
+
+    <line x1="610" y1="142" x2="668" y2="142" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- Song Unit Embedding s ∈ R^64 -->
+    <g filter="url(#card-shadow)">
+      <rect x="952" y="122" width="142" height="74" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2.2"/>
+    </g>
+    <text x="1023" y="155" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="20" font-weight="800" fill="#1e40af"><tspan font-style="italic">s</tspan> ∈ ℝ<tspan baseline-shift="super" font-size="13.5">64</tspan></text>
+    <text x="1023" y="182" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="15.5" font-weight="800" fill="#2563eb">‖<tspan font-style="italic">s</tspan>‖<tspan baseline-shift="sub" font-size="11.5">2</tspan> = 1</text>
+    <line x1="920" y1="159" x2="948" y2="159" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- LOWER TOWER: User Tower (Shifted down cleanly to y=444..578) -->
+    <polygon points="672,444 920,460 920,562 672,578" fill="#6d28d9" stroke="#4c1d95" stroke-width="2" filter="url(#card-shadow)"/>
+    <rect x="742" y="456" width="112" height="19" rx="9.5" fill="#4c1d95"/>
+    <text x="798" y="469" text-anchor="middle" font-size="9.5" font-weight="800" fill="#ddd6fe">TRAINABLE MLP</text>
+    <text x="798" y="497" text-anchor="middle" font-size="17" font-weight="800" fill="#ffffff">User Tower</text>
+    <text x="798" y="522" text-anchor="middle" font-size="13.5" font-weight="700" fill="#ede9fe">Linear (1024 → 256) · ReLU · Dropout(0.2)</text>
+    <text x="798" y="545" text-anchor="middle" font-size="13.5" font-weight="700" fill="#ede9fe">Linear (256 → 64) + L2 Norm</text>
+
+    <line x1="596" y1="473" x2="668" y2="473" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- User Unit Embedding u ∈ R^64 -->
+    <g filter="url(#card-shadow)">
+      <rect x="952" y="474" width="142" height="74" rx="10" fill="#ffffff" stroke="#6d28d9" stroke-width="2.2"/>
+    </g>
+    <text x="1023" y="507" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="20" font-weight="800" fill="#4c1d95"><tspan font-style="italic">u</tspan> ∈ ℝ<tspan baseline-shift="super" font-size="13.5">64</tspan></text>
+    <text x="1023" y="534" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="15.5" font-weight="800" fill="#6d28d9">‖<tspan font-style="italic">u</tspan>‖<tspan baseline-shift="sub" font-size="11.5">2</tspan> = 1</text>
+    <line x1="920" y1="511" x2="948" y2="511" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- ======================================================================= -->
+    <!-- 4. CENTER OF TWO TOWERS: TRAINING PATH (28px clearance, zero border piercing!) -->
+    <!-- ======================================================================= -->
+    <!-- Sample Construction Box with Header Badge -->
+    <g filter="url(#card-shadow)">
+      <rect x="668" y="262" width="170" height="146" rx="10" fill="#fff1f2" stroke="#dc2626" stroke-width="1.8"/>
+      <rect x="668" y="262" width="170" height="28" rx="10" fill="#dc2626"/>
+      <rect x="668" y="278" width="170" height="12" fill="#dc2626"/>
+    </g>
+    <text x="753" y="281" text-anchor="middle" font-size="12.5" font-weight="800" fill="#ffffff">训练链路 (Training Only)</text>
+    <text x="753" y="311" text-anchor="middle" font-size="13.5" font-weight="800" fill="#991b1b">样本构造 <tspan font-family="Cambria Math, serif" font-style="italic" font-size="15.5">y</tspan> ∈ {0, 1}</text>
+    <text x="753" y="334" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">• 正样本 (<tspan font-family="Cambria Math, serif" font-style="italic">y</tspan>=1): 完播 ≥ 0.6</text>
+    <text x="753" y="355" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">• 负样本 (<tspan font-family="Cambria Math, serif" font-style="italic">y</tspan>=0): 跳过 ≤ 0.3</text>
+    <text x="753" y="376" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">• 负采样: 4× 未听歌曲</text>
+    <text x="753" y="396" text-anchor="middle" font-size="11" fill="#64748b">共 10,209 条训练样本对</text>
+
+    <!-- BCE Loss Pill (Bold, generous size) -->
+    <g filter="url(#card-shadow)">
+      <rect x="852" y="305" width="84" height="60" rx="30" fill="#ffffff" stroke="#dc2626" stroke-width="2.5"/>
+    </g>
+    <text x="894" y="334" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="19" font-weight="800" fill="#dc2626">𝓛<tspan baseline-shift="sub" font-size="13">BCE</tspan></text>
+    <text x="894" y="354" text-anchor="middle" font-size="11.5" font-weight="800" fill="#b91c1c">Loss</text>
+
+    <!-- Arrow: Sample Labels -> L_BCE -->
+    <line x1="838" y1="335" x2="849" y2="335" stroke="#dc2626" stroke-width="2.2" marker-end="url(#arr-red)"/>
+
+    <!-- Scaled Cosine Operator Box (Large prominent formula!) -->
+    <g filter="url(#card-shadow)">
+      <rect x="948" y="296" width="150" height="78" rx="39" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+    </g>
+    <text x="1023" y="332" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="21" font-weight="800" fill="#0f172a">5 × ⟨<tspan font-style="italic">u</tspan>, <tspan font-style="italic">s</tspan>⟩</text>
+    <text x="1023" y="357" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">5 cos(<tspan font-family="Cambria Math, serif" font-style="italic">u</tspan>, <tspan font-family="Cambria Math, serif" font-style="italic">s</tspan>)</text>
+
+    <!-- Arrows from s and u into 5 * <u, s> -->
+    <line x1="1023" y1="196" x2="1023" y2="292" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+    <line x1="1023" y1="474" x2="1023" y2="378" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+
+    <!-- Red dashed gradient arrows from 5*<u,s> -> L_BCE -> Song Tower & User Tower -->
+    <line x1="948" y1="335" x2="938" y2="335" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="4 3" marker-end="url(#arr-red)"/>
+    <line x1="894" y1="305" x2="894" y2="216" stroke="#dc2626" stroke-width="2.4" stroke-dasharray="5 4" marker-end="url(#arr-red)"/>
+    <line x1="894" y1="365" x2="894" y2="454" stroke="#dc2626" stroke-width="2.4" stroke-dasharray="5 4" marker-end="url(#arr-red)"/>
+
+    <!-- ======================================================================= -->
+    <!-- 5. RIGHT: ONLINE SERVING / INFERENCE PATH (推理链路)                    -->
+    <!-- ======================================================================= -->
+    <rect x="1152" y="95" width="264" height="465" rx="16" fill="#f0fdf4" stroke="#059669" stroke-width="2.2"/>
+    <rect x="1172" y="82" width="224" height="26" rx="7" fill="#059669"/>
+    <text x="1284" y="99" text-anchor="middle" font-size="12.5" font-weight="800" fill="#ffffff">推理链路 · Online Serving</text>
+
+    <text x="1284" y="130" text-anchor="middle" font-size="13" font-weight="800" fill="#065f46">Koa /getRecommendSongs</text>
+    <text x="1284" y="149" text-anchor="middle" font-size="11.5" fill="#047857">Python 推理 + 10 min 结果缓存</text>
+
+    <g filter="url(#card-shadow)">
+      <!-- Step 1: Precompute Song Embeddings -->
+      <rect x="1172" y="166" width="224" height="84" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="1.8"/>
+      <text x="1284" y="192" text-anchor="middle" font-size="14" font-weight="800" fill="#0369a1">1. 全库歌曲向量预计算</text>
+      <text x="1284" y="217" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="16" font-weight="800" fill="#1e293b"><tspan font-style="italic">S</tspan> = song_emb(<tspan font-style="italic">V</tspan><tspan baseline-shift="sub" font-size="12">500×1024</tspan>)</text>
+      <text x="1284" y="239" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">常驻内存矩阵 <tspan font-family="Cambria Math, serif" font-style="italic" font-size="14">S</tspan> ∈ ℝ<tspan baseline-shift="super" font-size="10.5">500×64</tspan></text>
+
+      <!-- Step 2: Matrix Dot Product & Filter Played -->
+      <rect x="1172" y="283" width="224" height="96" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.8"/>
+      <text x="1284" y="310" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">2. 矩阵点积 &amp; 已听过滤</text>
+      <text x="1284" y="338" text-anchor="middle" font-family="Cambria Math, Times New Roman, serif" font-size="17.5" font-weight="800" fill="#0f172a">scores = <tspan font-style="italic">S</tspan><tspan baseline-shift="sub" font-size="12.5">500×64</tspan> · <tspan font-style="italic">u</tspan></text>
+      <text x="1284" y="363" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">剔除已播放 song_id ∈ played</text>
+
+      <!-- Step 3: Top-K Personalized Output -->
+      <rect x="1172" y="408" width="224" height="128" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2.2"/>
+      <text x="1284" y="436" text-anchor="middle" font-size="15.5" font-weight="800" fill="#166534">3. Top-K 个性化推荐</text>
+      <line x1="1190" y1="448" x2="1378" y2="448" stroke="#86efac" stroke-width="1.5"/>
+      <text x="1284" y="471" text-anchor="middle" font-family="Consolas, monospace" font-size="12.5" font-weight="700" fill="#15803d">algorithm = "two-tower-v2"</text>
+      <text x="1284" y="494" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">Sequelize 水合完整歌曲详情</text>
+      <text x="1284" y="516" text-anchor="middle" font-size="12" fill="#15803d">返回 recommendScore + reason</text>
+    </g>
+
+    <!-- Arrow from s ∈ R^64 into Step 1 -->
+    <path d="M 1094 159 H 1125 V 205 H 1168" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-dasharray="5 4" marker-end="url(#arr-blue)"/>
+    <!-- Arrow from 5*<u,s> directly into Step 2 -->
+    <line x1="1098" y1="335" x2="1168" y2="335" stroke="#1e293b" stroke-width="2.6" marker-end="url(#arr)"/>
+
+    <line x1="1284" y1="248" x2="1284" y2="281" stroke="#1e293b" stroke-width="2.2" marker-end="url(#arr)"/>
+    <line x1="1284" y1="379" x2="1284" y2="404" stroke="#1e293b" stroke-width="2.2" marker-end="url(#arr)"/>
+
+    <!-- ======================================================================= -->
+    <!-- 6. BOTTOM BYPASS: COLD-START FALLBACK + LEGEND                          -->
+    <!-- ======================================================================= -->
+    <path d="M 119 550 V 646 H 410" fill="none" stroke="#d97706" stroke-width="2.4" stroke-dasharray="6 4" marker-end="url(#arr-amber)"/>
+    <text x="255" y="635" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b45309">若新用户无播放记录 (plays = 0)</text>
+
+    <rect x="415" y="616" width="540" height="58" rx="12" fill="#fffbeb" stroke="#d97706" stroke-width="1.8" stroke-dasharray="6 4"/>
+    <text x="685" y="641" text-anchor="middle" font-size="14" font-weight="800" fill="#92400e">旁路兜底 · Cold-Start Fallback (Popularity 热门榜)</text>
+    <text x="685" y="662" text-anchor="middle" font-size="12" font-weight="600" fill="#b45309">按 user_plays 全站播放频次降序返回 Top-K，显式标记 algorithm = "popularity"</text>
+
+    <!-- Connects cleanly to the bottom of Step 3 Output Card -->
+    <path d="M 955 646 H 1284 V 540" fill="none" stroke="#d97706" stroke-width="2.4" stroke-dasharray="6 4" marker-end="url(#arr-amber)"/>
+    <text x="1120" y="635" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">直接返回热门 Top-K</text>
+
+    <!-- Clean Legend Row (Vector Badges instead of Windows Emojis!) -->
+    <rect x="24" y="698" width="1392" height="56" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+    <rect x="44" y="716" width="66" height="20" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.2"/>
+    <text x="77" y="730" text-anchor="middle" font-size="9.5" font-weight="800" fill="#0369a1">FROZEN</text>
+    <text x="120" y="731" font-size="13" font-weight="700" fill="#334155">冻结预训练编码器 (BGE-M3)</text>
+
+    <rect x="330" y="716" width="104" height="20" rx="10" fill="#1e3a8a"/>
+    <text x="382" y="730" text-anchor="middle" font-size="9.5" font-weight="800" fill="#bfdbfe">TRAINABLE MLP</text>
+    <text x="444" y="731" font-size="13" font-weight="700" fill="#334155">可训练双塔网络</text>
+
+    <line x1="575" y1="726" x2="618" y2="726" stroke="#1e293b" stroke-width="2.4" marker-end="url(#arr)"/>
+    <text x="628" y="731" font-size="13" font-weight="600" fill="#334155">前向推理流 (Inference)</text>
+
+    <line x1="805" y1="726" x2="848" y2="726" stroke="#dc2626" stroke-width="2.4" stroke-dasharray="5 4" marker-end="url(#arr-red)"/>
+    <text x="858" y="731" font-size="13" font-weight="600" fill="#dc2626">训练监督链路 (Training Loss)</text>
+
+    <line x1="1075" y1="726" x2="1118" y2="726" stroke="#d97706" stroke-width="2.2" stroke-dasharray="6 4" marker-end="url(#arr-amber)"/>
+    <text x="1128" y="731" font-size="13" font-weight="600" fill="#b45309">冷启动热门榜旁路 (Cold-Start Bypass)</text>
+
+  </svg>
+</div>
+</body>
+</html>

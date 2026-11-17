@@ -81,3 +81,10 @@ ehthumbs.db
 
 # Recommender checkpoint (rebuild with `python -m recsys.train`)
 recommend/artifacts/*.pt
+
+# Reference material / scratch (not code; too large or machine-specific)
+DocsForMusicAgent/references/
+DocsForMusicAgent/*.pdf
+DocsForMusicAgent/temp.md
+DocsForMusicAgent/最简app.js
+*.lnk
