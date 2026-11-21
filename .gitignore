@@ -78,8 +78,10 @@ ehthumbs.db
 # DevEco SDK wizard artifacts accidentally created in the repo root
 /26.0.0/
 /licenses/
+# 以下三项保留在本地，不推送到 GitHub（已从索引移除）
 /.claude/
 /DocsForMusicAgent/
+/db/
 # Recommender checkpoint (rebuild with `python -m recsys.train`)
 recommend/artifacts/*.pt
 
